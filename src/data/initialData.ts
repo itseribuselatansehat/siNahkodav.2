@@ -1,0 +1,1036 @@
+import { Pegawai, UnitPelayanan, MovementLog, LaporDiriRecord, TempatKerja } from '../types';
+
+export const TEMPAT_KERJA_LIST: { id: TempatKerja; label: string; pulau: string; coords: { lat: number; lng: number } }[] = [
+  {
+    id: 'Puskesmas Kepulauan Seribu Selatan',
+    label: 'Puskesmas Kec. Kepulauan Seribu Selatan',
+    pulau: 'Pulau Tidung',
+    coords: { lat: -5.7998, lng: 106.5235 }
+  },
+  {
+    id: 'Pustu Untung Jawa',
+    label: 'Puskesmas Pembantu Untung Jawa',
+    pulau: 'Pulau Untung Jawa',
+    coords: { lat: -5.9782, lng: 106.7058 }
+  },
+  {
+    id: 'Pustu Pulau Pari',
+    label: 'Puskesmas Pembantu Pulau Pari',
+    pulau: 'Pulau Pari',
+    coords: { lat: -5.8601, lng: 106.6186 }
+  },
+  {
+    id: 'Pustu Pulau Lancang',
+    label: 'Puskesmas Pembantu Pulau Lancang',
+    pulau: 'Pulau Lancang',
+    coords: { lat: -5.9221, lng: 106.5872 }
+  },
+  {
+    id: 'Kantor Transit Jakarta',
+    label: 'Kantor Transit Jakarta',
+    pulau: 'Daratan Jakarta (Marina Ancol / Kantor Penghubung)',
+    coords: { lat: -6.1245, lng: 106.8317 }
+  }
+];
+
+export const UNIT_PELAYANAN_LIST: UnitPelayanan[] = [
+  // Puskesmas Kepulauan Seribu Selatan - Lantai 1
+  { id: 'pus-l1-loket', name: 'Loket & Rekam Medis', tempatKerja: 'Puskesmas Kepulauan Seribu Selatan', lantai: 'Lantai 1', category: 'pelayanan', icon: 'Ticket', deskripsi: 'Pendaftaran & admisi pasien', kapasitasIdeal: 2 },
+  { id: 'pus-l1-umum', name: 'Poli Pelayanan Umum', tempatKerja: 'Puskesmas Kepulauan Seribu Selatan', lantai: 'Lantai 1', category: 'pelayanan', icon: 'Stethoscope', deskripsi: 'Pemeriksaan dokter umum', kapasitasIdeal: 2 },
+  { id: 'pus-l1-igd', name: 'Instalasi Gawat Darurat (IGD 24 Jam)', tempatKerja: 'Puskesmas Kepulauan Seribu Selatan', lantai: 'Lantai 1', category: 'pelayanan', icon: 'Ambulance', deskripsi: 'Penanganan kegawatdaruratan', kapasitasIdeal: 3 },
+  { id: 'pus-l1-kia', name: 'Poli KIA & KB', tempatKerja: 'Puskesmas Kepulauan Seribu Selatan', lantai: 'Lantai 1', category: 'pelayanan', icon: 'Baby', deskripsi: 'Kesehatan ibu & anak', kapasitasIdeal: 2 },
+  { id: 'pus-l1-farmasi', name: 'Apotek & Farmasi', tempatKerja: 'Puskesmas Kepulauan Seribu Selatan', lantai: 'Lantai 1', category: 'penunjang', icon: 'Pill', deskripsi: 'Peracikan & penyerahan obat', kapasitasIdeal: 2 },
+  { id: 'pus-l1-lab', name: 'Laboratorium Klinik', tempatKerja: 'Puskesmas Kepulauan Seribu Selatan', lantai: 'Lantai 1', category: 'penunjang', icon: 'FlaskConical', deskripsi: 'Pemeriksaan darah, urine & mikroskopis', kapasitasIdeal: 2 },
+  { id: 'pus-l1-triage', name: 'Pelayanan Awal (Triage / Skrining)', tempatKerja: 'Puskesmas Kepulauan Seribu Selatan', lantai: 'Lantai 1', category: 'pelayanan', icon: 'Activity', deskripsi: 'Pemeriksaan tanda vital awal', kapasitasIdeal: 2 },
+  { id: 'pus-l1-sekuriti', name: 'Pos Sekuriti & Informasi', tempatKerja: 'Puskesmas Kepulauan Seribu Selatan', lantai: 'Lantai 1', category: 'umum', icon: 'Shield', deskripsi: 'Keamanan & orientasi pengunjung', kapasitasIdeal: 1 },
+  { id: 'pus-l1-lorong', name: 'Lorong & Ruang Tunggu Lt. 1', tempatKerja: 'Puskesmas Kepulauan Seribu Selatan', lantai: 'Lantai 1', category: 'umum', icon: 'Footprints', deskripsi: 'Ruang tunggu pasien', kapasitasIdeal: 2 },
+
+  // Puskesmas Kepulauan Seribu Selatan - Lantai 2
+  { id: 'pus-l2-gigi', name: 'Poli Kesehatan Gigi & Mulut', tempatKerja: 'Puskesmas Kepulauan Seribu Selatan', lantai: 'Lantai 2', category: 'pelayanan', icon: 'Smile', deskripsi: 'Pemeriksaan & tindakan gigi', kapasitasIdeal: 2 },
+  { id: 'pus-l2-ptm', name: 'Poli PTM & Lansia', tempatKerja: 'Puskesmas Kepulauan Seribu Selatan', lantai: 'Lantai 2', category: 'pelayanan', icon: 'HeartPulse', deskripsi: 'Penyakit tidak menular & prolanis', kapasitasIdeal: 2 },
+  { id: 'pus-l2-imunisasi', name: 'Ruang Imunisasi & Tumbuh Kembang', tempatKerja: 'Puskesmas Kepulauan Seribu Selatan', lantai: 'Lantai 2', category: 'pelayanan', icon: 'Syringe', deskripsi: 'Vaksinasi bayi & balita', kapasitasIdeal: 2 },
+  { id: 'pus-l2-anak', name: 'Poli MTBS & Anak', tempatKerja: 'Puskesmas Kepulauan Seribu Selatan', lantai: 'Lantai 2', category: 'pelayanan', icon: 'HeartHandshake', deskripsi: 'Pelayanan balita sakit', kapasitasIdeal: 2 },
+  { id: 'pus-l2-rawat', name: 'Ruang Rawat Inap & Observasi', tempatKerja: 'Puskesmas Kepulauan Seribu Selatan', lantai: 'Lantai 2', category: 'pelayanan', icon: 'Bed', deskripsi: 'Perawatan sementara sebelum rujukan', kapasitasIdeal: 3 },
+  { id: 'pus-l2-gizi', name: 'Dapur Gizi & Konsultasi Diet', tempatKerja: 'Puskesmas Kepulauan Seribu Selatan', lantai: 'Lantai 2', category: 'penunjang', icon: 'Utensils', deskripsi: 'Pemberian makanan pasien & konseling gizi', kapasitasIdeal: 2 },
+  { id: 'pus-l2-gudang-obat', name: 'Gudang Logistik Farmasi', tempatKerja: 'Puskesmas Kepulauan Seribu Selatan', lantai: 'Lantai 2', category: 'penunjang', icon: 'Boxes', deskripsi: 'Penyimpanan stok obat & vaksin', kapasitasIdeal: 1 },
+  { id: 'pus-l2-ukm', name: 'Ruang Kerja UKM (Kesehatan Masyarakat)', tempatKerja: 'Puskesmas Kepulauan Seribu Selatan', lantai: 'Lantai 2', category: 'manajemen', icon: 'Users', deskripsi: 'Program promkes, kesling & surveilans', kapasitasIdeal: 4 },
+  { id: 'pus-l2-lorong', name: 'Lorong & Selasar Lt. 2', tempatKerja: 'Puskesmas Kepulauan Seribu Selatan', lantai: 'Lantai 2', category: 'umum', icon: 'Footprints', deskripsi: 'Akses penghubung lantai 2', kapasitasIdeal: 1 },
+
+  // Puskesmas Kepulauan Seribu Selatan - Lantai 3
+  { id: 'pus-l3-kapus', name: 'Ruang Pimpinan / Kepala Puskesmas', tempatKerja: 'Puskesmas Kepulauan Seribu Selatan', lantai: 'Lantai 3', category: 'manajemen', icon: 'Award', deskripsi: 'Kantor Kepala Puskesmas', kapasitasIdeal: 1 },
+  { id: 'pus-l3-kasubag', name: 'Ruang Kasubag Tata Usaha', tempatKerja: 'Puskesmas Kepulauan Seribu Selatan', lantai: 'Lantai 3', category: 'manajemen', icon: 'Briefcase', deskripsi: 'Administrasi kepegawaian & umum', kapasitasIdeal: 2 },
+  { id: 'pus-l3-kepegawaian', name: 'Ruang Kepegawaian & Diklat', tempatKerja: 'Puskesmas Kepulauan Seribu Selatan', lantai: 'Lantai 3', category: 'manajemen', icon: 'UserCheck', deskripsi: 'Pengelolaan SDM & absensi', kapasitasIdeal: 3 },
+  { id: 'pus-l3-keuangan', name: 'Ruang Keuangan & SPJ', tempatKerja: 'Puskesmas Kepulauan Seribu Selatan', lantai: 'Lantai 3', category: 'manajemen', icon: 'Wallet', deskripsi: 'Bendahara & pembukuan', kapasitasIdeal: 2 },
+  { id: 'pus-l3-rapat', name: 'Ruang Rapat Mini / Koordinasi', tempatKerja: 'Puskesmas Kepulauan Seribu Selatan', lantai: 'Lantai 3', category: 'manajemen', icon: 'UsersRound', deskripsi: 'Rapat koordinasi pimpinan', kapasitasIdeal: 8 },
+  { id: 'pus-l3-aula', name: 'Aula Serbaguna Nakhoda Sehat', tempatKerja: 'Puskesmas Kepulauan Seribu Selatan', lantai: 'Lantai 3', category: 'umum', icon: 'Building2', deskripsi: 'Pertemuan pleno, pembinaan & seminar', kapasitasIdeal: 30 },
+  { id: 'pus-l3-server', name: 'Ruang Server IT & Arsip', tempatKerja: 'Puskesmas Kepulauan Seribu Selatan', lantai: 'Lantai 3', category: 'penunjang', icon: 'Server', deskripsi: 'Data center & monitoring CCTV', kapasitasIdeal: 1 },
+
+  // Pustu Untung Jawa - Lantai 1
+  { id: 'uj-l1-loket', name: 'Ruang Loket', tempatKerja: 'Pustu Untung Jawa', lantai: 'Lantai 1', category: 'pelayanan', icon: 'Ticket', deskripsi: 'Pendaftaran & admisi pasien', kapasitasIdeal: 2 },
+  { id: 'uj-l1-farmasi', name: 'Ruang Farmasi', tempatKerja: 'Pustu Untung Jawa', lantai: 'Lantai 1', category: 'penunjang', icon: 'Pill', deskripsi: 'Peracikan obat & farmasi', kapasitasIdeal: 2 },
+  { id: 'uj-l1-triage', name: 'Ruang Pelayanan Awal', tempatKerja: 'Pustu Untung Jawa', lantai: 'Lantai 1', category: 'pelayanan', icon: 'Activity', deskripsi: 'Skrining & tanda vital awal', kapasitasIdeal: 2 },
+  { id: 'uj-l1-kia', name: 'Ruangan KIA', tempatKerja: 'Pustu Untung Jawa', lantai: 'Lantai 1', category: 'pelayanan', icon: 'Baby', deskripsi: 'Kesehatan ibu, anak & imunisasi', kapasitasIdeal: 2 },
+  { id: 'uj-l1-umum', name: 'Ruangan Pelayanan Umum', tempatKerja: 'Pustu Untung Jawa', lantai: 'Lantai 1', category: 'pelayanan', icon: 'Stethoscope', deskripsi: 'Pemeriksaan dokter umum & nakes', kapasitasIdeal: 2 },
+  { id: 'uj-l1-lorong', name: 'Ruang Selasar Lorong Lantai 1', tempatKerja: 'Pustu Untung Jawa', lantai: 'Lantai 1', category: 'umum', icon: 'Footprints', deskripsi: 'Selasar tunggu pasien Lt. 1', kapasitasIdeal: 3 },
+
+  // Pustu Untung Jawa - Lantai 2
+  { id: 'uj-l2-lab', name: 'Ruang LAB', tempatKerja: 'Pustu Untung Jawa', lantai: 'Lantai 2', category: 'penunjang', icon: 'FlaskConical', deskripsi: 'Pemeriksaan laboratorium sederhana', kapasitasIdeal: 2 },
+  { id: 'uj-l2-gigi', name: 'Ruangan Gigi', tempatKerja: 'Pustu Untung Jawa', lantai: 'Lantai 2', category: 'pelayanan', icon: 'Smile', deskripsi: 'Pemeriksaan & perawatan gigi', kapasitasIdeal: 2 },
+  { id: 'uj-l2-admin', name: 'Ruangan Administrasi', tempatKerja: 'Pustu Untung Jawa', lantai: 'Lantai 2', category: 'manajemen', icon: 'Briefcase', deskripsi: 'Administrasi & pelaporan Pustu', kapasitasIdeal: 2 },
+  { id: 'uj-l2-lorong', name: 'Ruangan Selasar Lorong Lantai 2', tempatKerja: 'Pustu Untung Jawa', lantai: 'Lantai 2', category: 'umum', icon: 'Footprints', deskripsi: 'Selasar & koridor Lt. 2', kapasitasIdeal: 2 },
+
+  // Pustu Pulau Pari
+  { id: 'pari-l1-umum', name: 'Poli Pelayanan Terpadu Lt. 1', tempatKerja: 'Pustu Pulau Pari', lantai: 'Lantai 1', category: 'pelayanan', icon: 'Stethoscope', deskripsi: 'Layanan kesehatan warga Pulau Pari & wisatawan', kapasitasIdeal: 2 },
+  { id: 'pari-l1-tindakan', name: 'Ruang Tindakan Gawat Darurat', tempatKerja: 'Pustu Pulau Pari', lantai: 'Lantai 1', category: 'pelayanan', icon: 'HeartPulse', deskripsi: 'Tindakan darurat sengatan laut & kecelakaan', kapasitasIdeal: 2 },
+  { id: 'pari-l2-jaga', name: 'Ruang Jaga Medis & Istirahat Lt. 2', tempatKerja: 'Pustu Pulau Pari', lantai: 'Lantai 2', category: 'penunjang', icon: 'Home', deskripsi: 'Pos siaga tenaga medis menginap', kapasitasIdeal: 2 },
+
+  // Pustu Pulau Lancang - Lantai 1
+  { id: 'lancang-l1-farmasi', name: 'Ruang Farmasi', tempatKerja: 'Pustu Pulau Lancang', lantai: 'Lantai 1', category: 'penunjang', icon: 'Pill', deskripsi: 'Penyediaan obat & peracikan', kapasitasIdeal: 2 },
+  { id: 'lancang-l1-umum', name: 'Ruang Pelayanan Umum', tempatKerja: 'Pustu Pulau Lancang', lantai: 'Lantai 1', category: 'pelayanan', icon: 'Stethoscope', deskripsi: 'Pemeriksaan medis umum', kapasitasIdeal: 2 },
+  { id: 'lancang-l1-loket', name: 'Ruangan Loket', tempatKerja: 'Pustu Pulau Lancang', lantai: 'Lantai 1', category: 'pelayanan', icon: 'Ticket', deskripsi: 'Pendaftaran & data rekam medis', kapasitasIdeal: 2 },
+  { id: 'lancang-l1-triage', name: 'Ruang Pelayanan Awal', tempatKerja: 'Pustu Pulau Lancang', lantai: 'Lantai 1', category: 'pelayanan', icon: 'Activity', deskripsi: 'Triage & pemeriksaan tanda vital', kapasitasIdeal: 2 },
+  { id: 'lancang-l1-kia', name: 'Ruang KIA', tempatKerja: 'Pustu Pulau Lancang', lantai: 'Lantai 1', category: 'pelayanan', icon: 'Baby', deskripsi: 'Kesehatan ibu, balita & KB', kapasitasIdeal: 2 },
+  { id: 'lancang-l1-lorong', name: 'Ruang Lorong Selasar Lantai 1', tempatKerja: 'Pustu Pulau Lancang', lantai: 'Lantai 1', category: 'umum', icon: 'Footprints', deskripsi: 'Lorong tunggu pasien Lt. 1', kapasitasIdeal: 3 },
+
+  // Pustu Pulau Lancang - Lantai 2
+  { id: 'lancang-l2-lab', name: 'Ruang LAB', tempatKerja: 'Pustu Pulau Lancang', lantai: 'Lantai 2', category: 'penunjang', icon: 'FlaskConical', deskripsi: 'Laboratorium klinik & tes cepat', kapasitasIdeal: 2 },
+  { id: 'lancang-l2-admin', name: 'Ruang Administrasi', tempatKerja: 'Pustu Pulau Lancang', lantai: 'Lantai 2', category: 'manajemen', icon: 'Briefcase', deskripsi: 'Kantor administrasi & arsip', kapasitasIdeal: 2 },
+  { id: 'lancang-l2-gigi', name: 'Ruang Gigi', tempatKerja: 'Pustu Pulau Lancang', lantai: 'Lantai 2', category: 'pelayanan', icon: 'Smile', deskripsi: 'Pelayanan kesehatan gigi & mulut', kapasitasIdeal: 2 },
+  { id: 'lancang-l2-lorong', name: 'Ruang Selasar Lorong', tempatKerja: 'Pustu Pulau Lancang', lantai: 'Lantai 2', category: 'umum', icon: 'Footprints', deskripsi: 'Selasar akses lantai 2', kapasitasIdeal: 2 },
+
+  // Kantor Transit Jakarta
+  { id: 'ktj-l1-posko', name: 'Ruang Transit & Koordinasi Pegawai', tempatKerja: 'Kantor Transit Jakarta', lantai: 'Lantai 1', category: 'manajemen', icon: 'Building2', deskripsi: 'Posko perwakilan & koordinasi dinas luar daratan Jakarta', kapasitasIdeal: 4 },
+  { id: 'ktj-l1-rapat', name: 'Ruang Rapat & Administrasi Penghubung', tempatKerja: 'Kantor Transit Jakarta', lantai: 'Lantai 1', category: 'manajemen', icon: 'UsersRound', deskripsi: 'Rapat koordinasi lintas dinas & RS rujukan DKI Jakarta', kapasitasIdeal: 6 },
+  { id: 'ktj-l1-istirahat', name: 'Kamar Singgah / Transit Medis', tempatKerja: 'Kantor Transit Jakarta', lantai: 'Lantai 1', category: 'penunjang', icon: 'Bed', deskripsi: 'Ruang istirahat nakes rujukan / transit sebelum kembali ke pulau', kapasitasIdeal: 2 }
+];
+
+export const INITIAL_PEGAWAI_LIST: Pegawai[] = [
+  // 1. Kapus (Admin Demo)
+  {
+    id: 'peg-1',
+    nip: '198207152006041002',
+    nama: 'drg. Ahmad Fauzi',
+    jabatan: 'Kepala Puskesmas',
+    profesi: 'Dokter Gigi',
+    tempatTugas: 'Puskesmas Kepulauan Seribu Selatan',
+    role: 'admin',
+    telepon: '081299887766',
+    avatar: 'https://images.unsplash.com/photo-1622253692010-333f2da6031d?w=150&auto=format&fit=crop&q=80',
+    status: 'hadir',
+    kondisi: 'siap_melayani',
+    kondisiCatatan: 'Sedang memimpin koordinasi monitoring puskesmas dan evaluasi mutu',
+    currentTempatKerja: 'Puskesmas Kepulauan Seribu Selatan',
+    currentLantai: 'Lantai 3',
+    currentUnitId: 'pus-l3-kapus',
+    currentUnitName: 'Ruang Pimpinan / Kepala Puskesmas',
+    lastCheckinTime: '06:58',
+    lastUpdateTime: '07:15',
+    coordinates: { lat: -5.79982, lng: 106.52351, accuracy: 8, distanceMeters: 12 }
+  },
+
+  // 2. Dokter Umum IGD (Sedang Tindakan Kasus Kritis!)
+  {
+    id: 'peg-2',
+    nip: '198904122014022003',
+    nama: 'dr. Farhan Malik',
+    jabatan: 'Dokter Penanggung Jawab IGD',
+    profesi: 'Dokter',
+    tempatTugas: 'Puskesmas Kepulauan Seribu Selatan',
+    role: 'pegawai',
+    telepon: '081311223344',
+    avatar: 'https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=150&auto=format&fit=crop&q=80',
+    status: 'hadir',
+    kondisi: 'tindakan_pasien',
+    kondisiCatatan: 'Sedang resusitasi pasien dehidrasi berat & sesak nafas di ruang bedah IGD',
+    currentTempatKerja: 'Puskesmas Kepulauan Seribu Selatan',
+    currentLantai: 'Lantai 1',
+    currentUnitId: 'pus-l1-igd',
+    currentUnitName: 'Instalasi Gawat Darurat (IGD 24 Jam)',
+    lastCheckinTime: '06:45',
+    lastUpdateTime: '07:20',
+    coordinates: { lat: -5.79979, lng: 106.52355, accuracy: 6, distanceMeters: 9 }
+  },
+
+  // 3. Perawat IGD (Butuh Bantuan Segera / Alert Demo!)
+  {
+    id: 'peg-3',
+    nip: '199506062020121004',
+    nama: 'Perawat Rudi Hermawan, S.Kep',
+    jabatan: 'Perawat Pelaksana IGD',
+    profesi: 'Perawat',
+    tempatTugas: 'Puskesmas Kepulauan Seribu Selatan',
+    role: 'pegawai',
+    telepon: '081234567803',
+    avatar: 'https://images.unsplash.com/photo-1582750433449-648ed127bb54?w=150&auto=format&fit=crop&q=80',
+    status: 'hadir',
+    kondisi: 'siap_melayani',
+    kondisiCatatan: 'Bertugas di IGD siap melayani pasien',
+    currentTempatKerja: 'Puskesmas Kepulauan Seribu Selatan',
+    currentLantai: 'Lantai 1',
+    currentUnitId: 'pus-l1-igd',
+    currentUnitName: 'Instalasi Gawat Darurat (IGD 24 Jam)',
+    lastCheckinTime: '07:00',
+    lastUpdateTime: '07:28',
+    coordinates: { lat: -5.79981, lng: 106.52354, accuracy: 10, distanceMeters: 14 }
+  },
+
+  // 4. Dokter Poli Umum
+  {
+    id: 'peg-4',
+    nip: '198502022010012015',
+    nama: 'dr. Rina Kusuma Wardhani',
+    jabatan: 'Dokter Fungsional Poli Umum',
+    profesi: 'Dokter',
+    tempatTugas: 'Puskesmas Kepulauan Seribu Selatan',
+    role: 'pegawai',
+    telepon: '081234567804',
+    avatar: 'https://images.unsplash.com/photo-1594824813571-638f02614d3f?w=150&auto=format&fit=crop&q=80',
+    status: 'hadir',
+    kondisi: 'siap_melayani',
+    kondisiCatatan: 'Poli umum aktif, melayani konsultasi rawat jalan',
+    currentTempatKerja: 'Puskesmas Kepulauan Seribu Selatan',
+    currentLantai: 'Lantai 1',
+    currentUnitId: 'pus-l1-umum',
+    currentUnitName: 'Poli Pelayanan Umum',
+    lastCheckinTime: '07:05',
+    lastUpdateTime: '07:10',
+    coordinates: { lat: -5.79978, lng: 106.52349, accuracy: 12, distanceMeters: 18 }
+  },
+
+  // 5. Perawat PTM (Demo Pegawai Login: NIP=67890)
+  {
+    id: 'peg-5',
+    nip: '67890',
+    nama: 'Suster Ani Rahayu, A.Md.Kep',
+    jabatan: 'Koordinator Pelayanan PTM & Lansia',
+    profesi: 'Perawat',
+    tempatTugas: 'Puskesmas Kepulauan Seribu Selatan',
+    role: 'pegawai',
+    telepon: '081234567805',
+    avatar: 'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=150&auto=format&fit=crop&q=80',
+    status: 'hadir',
+    kondisi: 'siap_melayani',
+    kondisiCatatan: 'Sedang skrining tensi & gula darah pasien prolanis lansia',
+    currentTempatKerja: 'Puskesmas Kepulauan Seribu Selatan',
+    currentLantai: 'Lantai 2',
+    currentUnitId: 'pus-l2-ptm',
+    currentUnitName: 'Poli PTM & Lansia',
+    lastCheckinTime: '07:10',
+    lastUpdateTime: '07:15',
+    coordinates: { lat: -5.79985, lng: 106.52352, accuracy: 7, distanceMeters: 11 }
+  },
+
+  // 6. Apoteker Farmasi
+  {
+    id: 'peg-6',
+    nip: '199204042018011005',
+    nama: 'apt. Rudi Santoso, S.Farm',
+    jabatan: 'Penanggung Jawab Farmasi & Obat',
+    profesi: 'Apoteker',
+    tempatTugas: 'Puskesmas Kepulauan Seribu Selatan',
+    role: 'pegawai',
+    telepon: '081234567806',
+    avatar: 'https://images.unsplash.com/photo-1628348068343-c6a848d2b6dd?w=150&auto=format&fit=crop&q=80',
+    status: 'hadir',
+    kondisi: 'siap_melayani',
+    kondisiCatatan: 'Menyiapkan resep obat kronis & stok harian',
+    currentTempatKerja: 'Puskesmas Kepulauan Seribu Selatan',
+    currentLantai: 'Lantai 1',
+    currentUnitId: 'pus-l1-farmasi',
+    currentUnitName: 'Apotek & Farmasi',
+    lastCheckinTime: '07:08',
+    lastUpdateTime: '07:20',
+    coordinates: { lat: -5.79983, lng: 106.52353, accuracy: 8, distanceMeters: 13 }
+  },
+
+  // 7. Bidan KIA
+  {
+    id: 'peg-7',
+    nip: '199003032015032007',
+    nama: 'Bidan Sari Handayani, S.Tr.Keb',
+    jabatan: 'Koordinator KIA & Imunisasi',
+    profesi: 'Bidan',
+    tempatTugas: 'Puskesmas Kepulauan Seribu Selatan',
+    role: 'pegawai',
+    telepon: '081234567807',
+    avatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&auto=format&fit=crop&q=80',
+    status: 'hadir',
+    kondisi: 'tindakan_pasien',
+    kondisiCatatan: 'Melakukan pemeriksaan USG & antenatal care ibu hamil risiko tinggi',
+    currentTempatKerja: 'Puskesmas Kepulauan Seribu Selatan',
+    currentLantai: 'Lantai 1',
+    currentUnitId: 'pus-l1-kia',
+    currentUnitName: 'Poli KIA & KB',
+    lastCheckinTime: '07:02',
+    lastUpdateTime: '07:18',
+    coordinates: { lat: -5.79980, lng: 106.52350, accuracy: 9, distanceMeters: 15 }
+  },
+
+  // 8. Bidan Yuni (Imunisasi)
+  {
+    id: 'peg-8',
+    nip: '199308122019022008',
+    nama: 'Bidan Yuni Astuti, A.Md.Keb',
+    jabatan: 'Bidan Pelaksana Imunisasi',
+    profesi: 'Bidan',
+    tempatTugas: 'Puskesmas Kepulauan Seribu Selatan',
+    role: 'pegawai',
+    telepon: '081234567808',
+    avatar: 'https://images.unsplash.com/photo-1567532939604-b6b5b0db2604?w=150&auto=format&fit=crop&q=80',
+    status: 'hadir',
+    kondisi: 'siap_melayani',
+    kondisiCatatan: 'Imunisasi dasar lengkap balita pulau berlangsung lancar',
+    currentTempatKerja: 'Puskesmas Kepulauan Seribu Selatan',
+    currentLantai: 'Lantai 2',
+    currentUnitId: 'pus-l2-imunisasi',
+    currentUnitName: 'Ruang Imunisasi & Tumbuh Kembang',
+    lastCheckinTime: '07:12',
+    lastUpdateTime: '07:22',
+    coordinates: { lat: -5.79986, lng: 106.52354, accuracy: 7, distanceMeters: 10 }
+  },
+
+  // 9. Analis Laboratorium
+  {
+    id: 'peg-9',
+    nip: '199411202020122009',
+    nama: 'Fitri Handayani, A.Md.AK',
+    jabatan: 'Pranata Laboratorium Kesehatan',
+    profesi: 'Analis Lab',
+    tempatTugas: 'Puskesmas Kepulauan Seribu Selatan',
+    role: 'pegawai',
+    telepon: '081234567809',
+    avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150&auto=format&fit=crop&q=80',
+    status: 'hadir',
+    kondisi: 'siap_melayani',
+    kondisiCatatan: 'Melakukan uji sampel darah lengkap & serologi DBD',
+    currentTempatKerja: 'Puskesmas Kepulauan Seribu Selatan',
+    currentLantai: 'Lantai 1',
+    currentUnitId: 'pus-l1-lab',
+    currentUnitName: 'Laboratorium Klinik',
+    lastCheckinTime: '07:05',
+    lastUpdateTime: '07:15',
+    coordinates: { lat: -5.79981, lng: 106.52348, accuracy: 6, distanceMeters: 8 }
+  },
+
+  // 10. Perawat Deni (Triage)
+  {
+    id: 'peg-10',
+    nip: '198805052012011006',
+    nama: 'Perawat Deni Iskandar, S.Kep',
+    jabatan: 'Perawat Koordinator Triage',
+    profesi: 'Perawat',
+    tempatTugas: 'Puskesmas Kepulauan Seribu Selatan',
+    role: 'pegawai',
+    telepon: '081234567810',
+    avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80',
+    status: 'hadir',
+    kondisi: 'siap_melayani',
+    kondisiCatatan: 'Triage pintu depan siap menyaring pasien batuk/demam',
+    currentTempatKerja: 'Puskesmas Kepulauan Seribu Selatan',
+    currentLantai: 'Lantai 1',
+    currentUnitId: 'pus-l1-triage',
+    currentUnitName: 'Pelayanan Awal (Triage / Skrining)',
+    lastCheckinTime: '06:55',
+    lastUpdateTime: '07:00',
+    coordinates: { lat: -5.79979, lng: 106.52352, accuracy: 5, distanceMeters: 7 }
+  },
+
+  // 11. Petugas Dapur Gizi (Istirahat sejenak)
+  {
+    id: 'peg-11',
+    nip: '199109092017042011',
+    nama: 'Rahmawati, S.Gz',
+    jabatan: 'Nutrisionis / Pengelola Gizi',
+    profesi: 'Nutrisionis',
+    tempatTugas: 'Puskesmas Kepulauan Seribu Selatan',
+    role: 'pegawai',
+    telepon: '081234567811',
+    avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
+    status: 'hadir',
+    kondisi: 'istirahat',
+    kondisiCatatan: 'Istirahat setelah mendistribusikan makan pagi pasien rawat inap',
+    currentTempatKerja: 'Puskesmas Kepulauan Seribu Selatan',
+    currentLantai: 'Lantai 2',
+    currentUnitId: 'pus-l2-gizi',
+    currentUnitName: 'Dapur Gizi & Konsultasi Diet',
+    lastCheckinTime: '06:40',
+    lastUpdateTime: '07:25',
+    coordinates: { lat: -5.79988, lng: 106.52356, accuracy: 11, distanceMeters: 17 }
+  },
+
+  // 12. Satpam Puskesmas
+  {
+    id: 'peg-12',
+    nip: '198108082015011012',
+    nama: 'Pak Slamet Riyadi',
+    jabatan: 'Petugas Pengamanan Puskesmas',
+    profesi: 'Petugas Keamanan',
+    tempatTugas: 'Puskesmas Kepulauan Seribu Selatan',
+    role: 'pegawai',
+    telepon: '081234567812',
+    avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&auto=format&fit=crop&q=80',
+    status: 'hadir',
+    kondisi: 'siap_melayani',
+    kondisiCatatan: 'Pos depan aman kondusif, mengatur alur parkir ambulans & pengunjung',
+    currentTempatKerja: 'Puskesmas Kepulauan Seribu Selatan',
+    currentLantai: 'Lantai 1',
+    currentUnitId: 'pus-l1-sekuriti',
+    currentUnitName: 'Pos Sekuriti & Informasi',
+    lastCheckinTime: '06:30',
+    lastUpdateTime: '06:30',
+    coordinates: { lat: -5.79975, lng: 106.52350, accuracy: 5, distanceMeters: 4 }
+  },
+
+  // 13. Kasubag Tata Usaha
+  {
+    id: 'peg-13',
+    nip: '197902142005011003',
+    nama: 'H. Bambang Sulistyo, S.Sos',
+    jabatan: 'Kasubag Tata Usaha',
+    profesi: 'Staf Administrasi',
+    tempatTugas: 'Puskesmas Kepulauan Seribu Selatan',
+    role: 'admin',
+    telepon: '081234567813',
+    avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&auto=format&fit=crop&q=80',
+    status: 'hadir',
+    kondisi: 'siap_melayani',
+    kondisiCatatan: 'Penyusunan berkas SPJ operasional pulau dan absensi dinas',
+    currentTempatKerja: 'Puskesmas Kepulauan Seribu Selatan',
+    currentLantai: 'Lantai 3',
+    currentUnitId: 'pus-l3-kasubag',
+    currentUnitName: 'Ruang Kasubag Tata Usaha',
+    lastCheckinTime: '07:05',
+    lastUpdateTime: '07:15',
+    coordinates: { lat: -5.79984, lng: 106.52352, accuracy: 8, distanceMeters: 12 }
+  },
+
+  // 14. Keuangan
+  {
+    id: 'peg-14',
+    nip: '198706182011012014',
+    nama: 'Nurul Hidayati, S.E.',
+    jabatan: 'Bendahara Penerimaan & Pengeluaran',
+    profesi: 'Staf Administrasi',
+    tempatTugas: 'Puskesmas Kepulauan Seribu Selatan',
+    role: 'pegawai',
+    telepon: '081234567814',
+    avatar: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=150&auto=format&fit=crop&q=80',
+    status: 'hadir',
+    kondisi: 'siap_melayani',
+    kondisiCatatan: 'Rekonsiliasi keuangan BLUD puskesmas',
+    currentTempatKerja: 'Puskesmas Kepulauan Seribu Selatan',
+    currentLantai: 'Lantai 3',
+    currentUnitId: 'pus-l3-keuangan',
+    currentUnitName: 'Ruang Keuangan & SPJ',
+    lastCheckinTime: '07:15',
+    lastUpdateTime: '07:20',
+    coordinates: { lat: -5.79986, lng: 106.52353, accuracy: 7, distanceMeters: 10 }
+  },
+
+  // 15. Kepegawaian & IT
+  {
+    id: 'peg-15',
+    nip: '199201152019031015',
+    nama: 'Ilham Pratama, S.Kom',
+    jabatan: 'Pengelola SIMPUS & Kepegawaian',
+    profesi: 'Staf Administrasi',
+    tempatTugas: 'Puskesmas Kepulauan Seribu Selatan',
+    role: 'admin',
+    telepon: '081234567815',
+    avatar: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=150&auto=format&fit=crop&q=80',
+    status: 'hadir',
+    kondisi: 'siap_melayani',
+    kondisiCatatan: 'Monitoring koneksi internet satelit & sinkronisasi data SI NAKHODA',
+    currentTempatKerja: 'Puskesmas Kepulauan Seribu Selatan',
+    currentLantai: 'Lantai 3',
+    currentUnitId: 'pus-l3-kepegawaian',
+    currentUnitName: 'Ruang Kepegawaian & Diklat',
+    lastCheckinTime: '07:00',
+    lastUpdateTime: '07:10',
+    coordinates: { lat: -5.79983, lng: 106.52351, accuracy: 6, distanceMeters: 8 }
+  },
+
+  // 16. Sanitarian (Dinas Luar: Fogging dan Cek Jentik di Pemukiman Tidung)
+  {
+    id: 'peg-16',
+    nip: '198910102014021016',
+    nama: 'Doni Saputra, S.Tr.Kes',
+    jabatan: 'Sanitarian Lingkungan',
+    profesi: 'Sanitarian',
+    tempatTugas: 'Puskesmas Kepulauan Seribu Selatan',
+    role: 'pegawai',
+    telepon: '081234567816',
+    avatar: 'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=150&auto=format&fit=crop&q=80',
+    status: 'dinas_luar',
+    kondisi: 'dinas_luar',
+    kondisiCatatan: 'Surveilans kualitas air bersih & pemantauan jentik nyamuk RW 02 Pulau Tidung',
+    currentTempatKerja: 'Puskesmas Kepulauan Seribu Selatan',
+    currentLantai: 'Area Luar / Lapangan',
+    lastCheckinTime: '07:10',
+    lastUpdateTime: '07:25',
+    coordinates: { lat: -5.8015, lng: 106.5280, accuracy: 15, distanceMeters: 520 }
+  },
+
+  // 17. Pengelola Transportasi Rujukan
+  {
+    id: 'peg-17',
+    nip: '198305142011011017',
+    nama: 'Kapten Arifin Syahputra',
+    jabatan: 'Koordinator Transportasi Rujukan Pasien',
+    profesi: 'Staf Administrasi',
+    tempatTugas: 'Puskesmas Kepulauan Seribu Selatan',
+    role: 'pegawai',
+    telepon: '081234567817',
+    avatar: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=150&auto=format&fit=crop&q=80',
+    status: 'hadir',
+    kondisi: 'siap_melayani',
+    kondisiCatatan: 'Standby koordinasi transportasi rujukan dermaga Pulau Tidung',
+    currentTempatKerja: 'Puskesmas Kepulauan Seribu Selatan',
+    currentLantai: 'Lantai 1',
+    currentUnitId: 'pus-l1-sekuriti',
+    currentUnitName: 'Pos Sekuriti & Informasi',
+    lastCheckinTime: '06:30',
+    lastUpdateTime: '07:00',
+    coordinates: { lat: -5.8021, lng: 106.5218, accuracy: 8, distanceMeters: 280 }
+  },
+
+  // 18. Perawat Evakuasi Rujukan Pasien
+  {
+    id: 'peg-18',
+    nip: '199103152016021018',
+    nama: 'Perawat Hendra Wijaya, A.Md.Kep',
+    jabatan: 'Perawat Pelaksana IGD & Rujukan',
+    profesi: 'Perawat',
+    tempatTugas: 'Puskesmas Kepulauan Seribu Selatan',
+    role: 'pegawai',
+    telepon: '081234567818',
+    avatar: 'https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?w=150&auto=format&fit=crop&q=80',
+    status: 'dinas_luar',
+    kondisi: 'dinas_luar',
+    kondisiCatatan: 'Mendampingi rujukan pasien stroke menuju RSUD daratan',
+    currentTempatKerja: 'Puskesmas Kepulauan Seribu Selatan',
+    currentLantai: 'Lantai 1',
+    currentUnitId: 'pus-l1-igd',
+    currentUnitName: 'Instalasi Gawat Darurat (IGD 24 Jam)',
+    lastCheckinTime: '06:15',
+    lastUpdateTime: '07:15',
+    coordinates: { lat: -5.8900, lng: 106.6750, accuracy: 25, distanceMeters: 4500 }
+  },
+
+  // === PUSTU UNTUNG JAWA ===
+  // 19. Perawat Penanggung Jawab Pustu Untung Jawa
+  {
+    id: 'peg-19',
+    nip: '198712122012011019',
+    nama: 'Perawat Teguh Wibowo, S.Kep',
+    jabatan: 'Kepala Pustu Untung Jawa',
+    profesi: 'Perawat',
+    tempatTugas: 'Pustu Untung Jawa',
+    role: 'pegawai',
+    telepon: '081234567819',
+    avatar: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=150&auto=format&fit=crop&q=80',
+    status: 'hadir',
+    kondisi: 'siap_melayani',
+    kondisiCatatan: 'Layanan poli umum Untung Jawa dibuka, 6 pasien telah mendaftar',
+    currentTempatKerja: 'Pustu Untung Jawa',
+    currentLantai: 'Lantai 1',
+    currentUnitId: 'uj-l1-umum',
+    currentUnitName: 'Poli Pelayanan & Farmasi Lt. 1',
+    lastCheckinTime: '07:00',
+    lastUpdateTime: '07:05',
+    coordinates: { lat: -5.97825, lng: 106.70582, accuracy: 6, distanceMeters: 8 }
+  },
+
+  // 20. Bidan Untung Jawa
+  {
+    id: 'peg-20',
+    nip: '199304152018022020',
+    nama: 'Bidan Ratna Dewi, A.Md.Keb',
+    jabatan: 'Bidan Desa Untung Jawa',
+    profesi: 'Bidan',
+    tempatTugas: 'Pustu Untung Jawa',
+    role: 'pegawai',
+    telepon: '081234567820',
+    avatar: 'https://images.unsplash.com/photo-1548142813-c348350df52b?w=150&auto=format&fit=crop&q=80',
+    status: 'hadir',
+    kondisi: 'siap_melayani',
+    kondisiCatatan: 'Poli KIA siap, konsultasi ibu nifas & KB',
+    currentTempatKerja: 'Pustu Untung Jawa',
+    currentLantai: 'Lantai 1',
+    currentUnitId: 'uj-l1-kia',
+    currentUnitName: 'Poli KIA / Bersalin Lt. 1',
+    lastCheckinTime: '07:08',
+    lastUpdateTime: '07:12',
+    coordinates: { lat: -5.97822, lng: 106.70585, accuracy: 7, distanceMeters: 10 }
+  },
+
+  // 21. Perawat Jaga Untung Jawa
+  {
+    id: 'peg-21',
+    nip: '199602202022031021',
+    nama: 'Perawat Fikri Haikal, A.Md.Kep',
+    jabatan: 'Perawat Piket Jaga Untung Jawa',
+    profesi: 'Perawat',
+    tempatTugas: 'Pustu Untung Jawa',
+    role: 'pegawai',
+    telepon: '081234567821',
+    avatar: 'https://images.unsplash.com/photo-1501196354995-cbb51c65aaea?w=150&auto=format&fit=crop&q=80',
+    status: 'hadir',
+    kondisi: 'siap_melayani',
+    kondisiCatatan: 'Observasi ruang rawat inap pustu kondisi kosong stabil',
+    currentTempatKerja: 'Pustu Untung Jawa',
+    currentLantai: 'Lantai 2',
+    currentUnitId: 'uj-l2-rawat',
+    currentUnitName: 'Ruang Observasi & Istirahat Lt. 2',
+    lastCheckinTime: '06:50',
+    lastUpdateTime: '07:00',
+    coordinates: { lat: -5.97821, lng: 106.70580, accuracy: 9, distanceMeters: 12 }
+  },
+
+  // === PUSTU PULAU PARI ===
+  // 22. dr. Pari
+  {
+    id: 'peg-22',
+    nip: '199105252018021022',
+    nama: 'dr. Dimas Prasetyo',
+    jabatan: 'Dokter Penanggung Jawab Pustu Pari',
+    profesi: 'Dokter',
+    tempatTugas: 'Pustu Pulau Pari',
+    role: 'pegawai',
+    telepon: '081234567822',
+    avatar: 'https://images.unsplash.com/photo-1537368910025-700350fe46c7?w=150&auto=format&fit=crop&q=80',
+    status: 'hadir',
+    kondisi: 'siap_melayani',
+    kondisiCatatan: 'Pelayanan terpadu warga Pari dan wisatawan Pantai Pasir Perawan',
+    currentTempatKerja: 'Pustu Pulau Pari',
+    currentLantai: 'Lantai 1',
+    currentUnitId: 'pari-l1-umum',
+    currentUnitName: 'Poli Pelayanan Terpadu Lt. 1',
+    lastCheckinTime: '07:15',
+    lastUpdateTime: '07:15',
+    coordinates: { lat: -5.86012, lng: 106.61864, accuracy: 8, distanceMeters: 11 }
+  },
+
+  // 23. Bidan Pari
+  {
+    id: 'peg-23',
+    nip: '199013132016022023',
+    nama: 'Bidan Nita Anggraini, S.Tr.Keb',
+    jabatan: 'Bidan Pelaksana Pustu Pari',
+    profesi: 'Bidan',
+    tempatTugas: 'Pustu Pulau Pari',
+    role: 'pegawai',
+    telepon: '081234567823',
+    avatar: 'https://images.unsplash.com/photo-1544717305-2782549b5136?w=150&auto=format&fit=crop&q=80',
+    status: 'hadir',
+    kondisi: 'tindakan_pasien',
+    kondisiCatatan: 'Menangani partus / persalinan spontan warga RT 01 Pulau Pari',
+    currentTempatKerja: 'Pustu Pulau Pari',
+    currentLantai: 'Lantai 1',
+    currentUnitId: 'pari-l1-tindakan',
+    currentUnitName: 'Ruang Tindakan Gawat Darurat',
+    lastCheckinTime: '06:50',
+    lastUpdateTime: '07:20',
+    coordinates: { lat: -5.86015, lng: 106.61868, accuracy: 7, distanceMeters: 9 }
+  },
+
+  // 24. Perawat Pari (Istirahat Jaga Malam)
+  {
+    id: 'peg-24',
+    nip: '199407102021021024',
+    nama: 'Perawat Reza Kurniawan, A.Md.Kep',
+    jabatan: 'Perawat Pelaksana Pustu Pari',
+    profesi: 'Perawat',
+    tempatTugas: 'Pustu Pulau Pari',
+    role: 'pegawai',
+    telepon: '081234567824',
+    avatar: 'https://images.unsplash.com/photo-1527980965255-d3b416303d12?w=150&auto=format&fit=crop&q=80',
+    status: 'hadir',
+    kondisi: 'istirahat',
+    kondisiCatatan: 'Istirahat setelah serah terima piket malam, standby on-call',
+    currentTempatKerja: 'Pustu Pulau Pari',
+    currentLantai: 'Lantai 2',
+    currentUnitId: 'pari-l2-jaga',
+    currentUnitName: 'Ruang Jaga Medis & Istirahat Lt. 2',
+    lastCheckinTime: '06:00',
+    lastUpdateTime: '07:00',
+    coordinates: { lat: -5.86010, lng: 106.61860, accuracy: 10, distanceMeters: 14 }
+  },
+
+  // === PUSTU PULAU LANCANG ===
+  // 25. Perawat Lancang
+  {
+    id: 'peg-25',
+    nip: '198909182015011025',
+    nama: 'Perawat Agus Salim, S.Kep',
+    jabatan: 'Penanggung Jawab Pustu Lancang',
+    profesi: 'Perawat',
+    tempatTugas: 'Pustu Pulau Lancang',
+    role: 'pegawai',
+    telepon: '081234567825',
+    avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&auto=format&fit=crop&q=80',
+    status: 'hadir',
+    kondisi: 'siap_melayani',
+    kondisiCatatan: 'Layanan medis pulau lancang beroperasi normal',
+    currentTempatKerja: 'Pustu Pulau Lancang',
+    currentLantai: 'Lantai 1',
+    currentUnitId: 'lancang-l1-umum',
+    currentUnitName: 'Poli Pelayanan & Bersalin Lt. 1',
+    lastCheckinTime: '07:10',
+    lastUpdateTime: '07:12',
+    coordinates: { lat: -5.92215, lng: 106.58722, accuracy: 8, distanceMeters: 10 }
+  },
+
+  // 26. Bidan Lancang
+  {
+    id: 'peg-26',
+    nip: '199511122021022026',
+    nama: 'Bidan Maya Safitri, A.Md.Keb',
+    jabatan: 'Bidan Pelaksana Lancang',
+    profesi: 'Bidan',
+    tempatTugas: 'Pustu Pulau Lancang',
+    role: 'pegawai',
+    telepon: '081234567826',
+    avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150&auto=format&fit=crop&q=80',
+    status: 'hadir',
+    kondisi: 'siap_melayani',
+    kondisiCatatan: 'Pemberian vitamin A & penimbangan bayi balita',
+    currentTempatKerja: 'Pustu Pulau Lancang',
+    currentLantai: 'Lantai 1',
+    currentUnitId: 'lancang-l1-umum',
+    currentUnitName: 'Poli Pelayanan & Bersalin Lt. 1',
+    lastCheckinTime: '07:15',
+    lastUpdateTime: '07:18',
+    coordinates: { lat: -5.92212, lng: 106.58720, accuracy: 9, distanceMeters: 12 }
+  },
+
+  // === PEGAWAI BELUM CHECK-IN / BELUM DI TEMPAT (UNTUK MONITORING REPORT) ===
+  // 27. Pegawai Belum Hadir 1
+  {
+    id: 'peg-27',
+    nip: '199008222019021027',
+    nama: 'dr. Eko Prasetyawan',
+    jabatan: 'Dokter Fungsional Poli Gigi',
+    profesi: 'Dokter Gigi',
+    tempatTugas: 'Puskesmas Kepulauan Seribu Selatan',
+    role: 'pegawai',
+    telepon: '081234567827',
+    avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
+    status: 'belum_hadir',
+    kondisi: 'belum_hadir',
+    kondisiCatatan: 'Izin keterlambatan jadwal kapal perintis dari Pelabuhan Marina Ancol'
+  },
+
+  // 28. Pegawai Belum Hadir 2
+  {
+    id: 'peg-28',
+    nip: '199312152020122028',
+    nama: 'Siti Rohani, A.Md.RMIK',
+    jabatan: 'Perekam Medis Loket',
+    profesi: 'Staf Administrasi',
+    tempatTugas: 'Puskesmas Kepulauan Seribu Selatan',
+    role: 'pegawai',
+    telepon: '081234567828',
+    avatar: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=150&auto=format&fit=crop&q=80',
+    status: 'belum_hadir',
+    kondisi: 'belum_hadir',
+    kondisiCatatan: 'Belum melakukan check-in di ruangan'
+  },
+
+  // 29. Pegawai Belum Hadir 3 (Pustu Lancang)
+  {
+    id: 'peg-29',
+    nip: '199401182022031029',
+    nama: 'Yusuf Maulana, A.Md.Kes',
+    jabatan: 'Petugas Pengelola Obat Lancang',
+    profesi: 'Apoteker',
+    tempatTugas: 'Pustu Pulau Lancang',
+    role: 'pegawai',
+    telepon: '081234567829',
+    avatar: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=150&auto=format&fit=crop&q=80',
+    status: 'belum_hadir',
+    kondisi: 'belum_hadir',
+    kondisiCatatan: 'Belum check-in - Perlu konfirmasi kehadiran kapal nelayan'
+  },
+
+  // === KANTOR TRANSIT JAKARTA ===
+  // 30. Staf Penghubung Kantor Transit Jakarta
+  {
+    id: 'peg-30',
+    nip: '199204142017031030',
+    nama: 'Rian Hidayat, S.AP',
+    jabatan: 'Pengadministrasi Penghubung Jakarta',
+    profesi: 'Staf Administrasi',
+    tempatTugas: 'Kantor Transit Jakarta',
+    role: 'pegawai',
+    telepon: '081234567830',
+    avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80',
+    status: 'hadir',
+    kondisi: 'siap_melayani',
+    kondisiCatatan: 'Standby koordinasi penerimaan rujukan dan pengadaan obat/logistik daratan',
+    currentTempatKerja: 'Kantor Transit Jakarta',
+    currentLantai: 'Lantai 1',
+    currentUnitId: 'ktj-l1-posko',
+    currentUnitName: 'Ruang Transit & Koordinasi Pegawai',
+    lastCheckinTime: '07:05',
+    lastUpdateTime: '07:10',
+    coordinates: { lat: -6.12452, lng: 106.83171, accuracy: 6, distanceMeters: 8 }
+  },
+
+  // 31. Perawat Transit Jakarta
+  {
+    id: 'peg-31',
+    nip: '199307222019022031',
+    nama: 'Ns. Ratna Dewi, S.Kep',
+    jabatan: 'Perawat Koordinasi Transit Rujukan',
+    profesi: 'Perawat',
+    tempatTugas: 'Kantor Transit Jakarta',
+    role: 'pegawai',
+    telepon: '081234567831',
+    avatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&auto=format&fit=crop&q=80',
+    status: 'belum_hadir',
+    kondisi: 'belum_hadir',
+    kondisiCatatan: 'Belum check-in di Kantor Transit'
+  }
+];
+
+export const INITIAL_MOVEMENT_LOGS: MovementLog[] = [
+  {
+    id: 'mov-1',
+    timestamp: '07:28',
+    date: 'Hari ini',
+    pegawaiId: 'peg-3',
+    pegawaiNama: 'Perawat Rudi Hermawan, S.Kep',
+    nip: '199506062020121004',
+    tempatKerja: 'Puskesmas Kepulauan Seribu Selatan',
+    lantai: 'Lantai 1',
+    dariUnit: 'Pelayanan Awal (Triage / Skrining)',
+    keUnit: 'Instalasi Gawat Darurat (IGD 24 Jam)',
+    kondisi: 'tindakan_pasien',
+    catatan: 'Permintaan bantuan tim & oksigen untuk penanganan gawat darurat',
+    coordinates: { lat: -5.79981, lng: 106.52354 }
+  },
+  {
+    id: 'mov-2',
+    timestamp: '07:20',
+    date: 'Hari ini',
+    pegawaiId: 'peg-6',
+    pegawaiNama: 'apt. Rudi Santoso, S.Farm',
+    nip: '199204042018011005',
+    tempatKerja: 'Puskesmas Kepulauan Seribu Selatan',
+    lantai: 'Lantai 1',
+    keUnit: 'Apotek & Farmasi',
+    kondisi: 'siap_melayani',
+    catatan: 'Check-in awal bertugas dan penyiapan racikan resep',
+    coordinates: { lat: -5.79983, lng: 106.52353 }
+  },
+  {
+    id: 'mov-3',
+    timestamp: '07:18',
+    date: 'Hari ini',
+    pegawaiId: 'peg-7',
+    pegawaiNama: 'Bidan Sari Handayani, S.Tr.Keb',
+    nip: '199003032015032007',
+    tempatKerja: 'Puskesmas Kepulauan Seribu Selatan',
+    lantai: 'Lantai 1',
+    keUnit: 'Poli KIA & KB',
+    kondisi: 'tindakan_pasien',
+    catatan: 'Melakukan tindakan pemeriksaan antenatal care',
+    coordinates: { lat: -5.79980, lng: 106.52350 }
+  },
+  {
+    id: 'mov-4',
+    timestamp: '07:15',
+    date: 'Hari ini',
+    pegawaiId: 'peg-5',
+    pegawaiNama: 'Suster Ani Rahayu, A.Md.Kep',
+    nip: '67890',
+    tempatKerja: 'Puskesmas Kepulauan Seribu Selatan',
+    lantai: 'Lantai 2',
+    keUnit: 'Poli PTM & Lansia',
+    kondisi: 'siap_melayani',
+    catatan: 'Masuk bertugas di ruang PTM dan skrining kesehatan',
+    coordinates: { lat: -5.79985, lng: 106.52352 }
+  },
+  {
+    id: 'mov-5',
+    timestamp: '07:15',
+    date: 'Hari ini',
+    pegawaiId: 'peg-18',
+    pegawaiNama: 'Perawat Hendra Wijaya, A.Md.Kep',
+    nip: '199103152016021018',
+    tempatKerja: 'Puskesmas Kepulauan Seribu Selatan',
+    lantai: 'Lantai 1',
+    keUnit: 'Instalasi Gawat Darurat (IGD 24 Jam)',
+    kondisi: 'dinas_luar',
+    catatan: 'Evakuasi rujukan pasien darurat via kapal ambulans menuju RSUD daratan',
+    coordinates: { lat: -5.8900, lng: 106.6750 }
+  },
+  {
+    id: 'mov-6',
+    timestamp: '07:10',
+    date: 'Hari ini',
+    pegawaiId: 'peg-4',
+    pegawaiNama: 'dr. Rina Kusuma Wardhani',
+    nip: '198502022010012015',
+    tempatKerja: 'Puskesmas Kepulauan Seribu Selatan',
+    lantai: 'Lantai 1',
+    keUnit: 'Poli Pelayanan Umum',
+    kondisi: 'siap_melayani',
+    catatan: 'Membuka pelayanan dokter poli umum',
+    coordinates: { lat: -5.79978, lng: 106.52349 }
+  },
+  {
+    id: 'mov-7',
+    timestamp: '07:05',
+    date: 'Hari ini',
+    pegawaiId: 'peg-1',
+    pegawaiNama: 'drg. Ahmad Fauzi',
+    nip: '198207152006041002',
+    tempatKerja: 'Puskesmas Kepulauan Seribu Selatan',
+    lantai: 'Lantai 3',
+    keUnit: 'Ruang Pimpinan / Kepala Puskesmas',
+    kondisi: 'siap_melayani',
+    catatan: 'Pimpinan tiba dan memantau status operasional',
+    coordinates: { lat: -5.79982, lng: 106.52351 }
+  }
+];
+
+export const INITIAL_LAPOR_DIRI: LaporDiriRecord[] = [
+  {
+    id: 'lap-upacara-1',
+    timestamp: '07:30',
+    date: 'Hari ini',
+    isoDate: '2026-10-23',
+    pegawaiId: 'peg-1',
+    pegawaiNama: 'drg. Ahmad Fauzi',
+    nip: '198207152006041002',
+    jabatan: 'Kepala Puskesmas',
+    tempatTugas: 'Puskesmas Kepulauan Seribu Selatan',
+    kegiatan: 'Upacara',
+    detail: 'Upacara Peringatan Hari Kesehatan Nasional (HKN) & Upacara Bendera Gabungan ASN',
+    lokasi: 'Lapangan Upacara Puskesmas Pulau Tidung',
+    alamatLokasi: 'Jl. Raya Pulau Tidung RT 02/RW 02, Kel. Pulau Tidung, Kec. Kepulauan Seribu Selatan',
+    fotoUrl: 'https://images.unsplash.com/photo-1541872703-74c5e44368f9?w=400&auto=format&fit=crop&q=80',
+    coordinates: { lat: -5.7998, lng: 106.5235 }
+  },
+  {
+    id: 'lap-1',
+    timestamp: '07:15',
+    date: 'Hari ini',
+    isoDate: '2026-10-23',
+    pegawaiId: 'peg-1',
+    pegawaiNama: 'drg. Ahmad Fauzi',
+    nip: '198207152006041002',
+    jabatan: 'Kepala Puskesmas',
+    tempatTugas: 'Puskesmas Kepulauan Seribu Selatan',
+    kegiatan: 'Apel Pagi',
+    detail: 'Memimpin Apel Pagi Gabungan Tenaga Kesehatan Pulau Tidung',
+    lokasi: 'Halaman Utama Puskesmas',
+    alamatLokasi: 'Jl. Raya Pulau Tidung RT 02/RW 02, Kel. Pulau Tidung, Kec. Kepulauan Seribu Selatan',
+    fotoUrl: 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=400&auto=format&fit=crop&q=80',
+    coordinates: { lat: -5.7998, lng: 106.5235 }
+  },
+  {
+    id: 'lap-2',
+    timestamp: '07:10',
+    date: 'Hari ini',
+    isoDate: '2026-10-23',
+    pegawaiId: 'peg-16',
+    pegawaiNama: 'Doni Saputra, S.Tr.Kes',
+    nip: '198910102014021016',
+    jabatan: 'Sanitarian Lingkungan',
+    tempatTugas: 'Puskesmas Kepulauan Seribu Selatan',
+    kegiatan: 'Dinas Luar Awal',
+    detail: 'Pemberangkatan inspeksi jentik berkala & fogging terarah di pemukiman pesisir',
+    lokasi: 'RW 02 Pemukiman Nelayan Pulau Tidung',
+    alamatLokasi: 'Jl. Dermaga Pelabuhan Utama RT 01/RW 02, Kel. Pulau Tidung, Kec. Kepulauan Seribu Selatan',
+    fotoUrl: 'https://images.unsplash.com/photo-1584515979956-d9f6e5d09982?w=400&auto=format&fit=crop&q=80',
+    coordinates: { lat: -5.8015, lng: 106.5280 }
+  },
+  {
+    id: 'lap-3',
+    timestamp: '11:45',
+    date: 'Hari ini',
+    isoDate: '2026-10-23',
+    pegawaiId: 'peg-16',
+    pegawaiNama: 'Doni Saputra, S.Tr.Kes',
+    nip: '198910102014021016',
+    jabatan: 'Sanitarian Lingkungan',
+    tempatTugas: 'Puskesmas Kepulauan Seribu Selatan',
+    kegiatan: 'Dinas Luar Akhir',
+    detail: 'Penyelesaian penaburan abate pada 45 tandon air warga dan pelaporan berita acara ke kantor lurah',
+    lokasi: 'Pos RW 03 Pulau Tidung',
+    alamatLokasi: 'Jl. Pantai Jembatan Cinta RT 04/RW 01, Kel. Pulau Tidung, Kec. Kepulauan Seribu Selatan',
+    fotoUrl: 'https://images.unsplash.com/photo-1581056771107-24ca5f033842?w=400&auto=format&fit=crop&q=80',
+    coordinates: { lat: -5.8021, lng: 106.5292 }
+  },
+  {
+    id: 'lap-4',
+    timestamp: '08:00',
+    date: 'Hari ini',
+    isoDate: '2026-10-23',
+    pegawaiId: 'peg-7',
+    pegawaiNama: 'Bidan Nurhaliza, S.Tr.Keb',
+    nip: '199209182015032007',
+    jabatan: 'Bidan Pelaksana KIA / Koordinator Ibu Hamil',
+    tempatTugas: 'Puskesmas Kepulauan Seribu Selatan',
+    kegiatan: 'Dinas Luar Awal',
+    detail: 'Kunjungan ANC (Antenatal Care) ke rumah ibu hamil risiko tinggi di wilayah pesisir timur',
+    lokasi: 'RT 04/RW 01 Pulau Tidung',
+    alamatLokasi: 'Jl. Pantai Jembatan Cinta RT 04/RW 01, Kel. Pulau Tidung, Kec. Kepulauan Seribu Selatan',
+    fotoUrl: 'https://images.unsplash.com/photo-1579684385127-1ef15d508118?w=400&auto=format&fit=crop&q=80',
+    coordinates: { lat: -5.8032, lng: 106.5312 }
+  },
+  {
+    id: 'lap-5',
+    timestamp: '12:30',
+    date: 'Hari ini',
+    isoDate: '2026-10-23',
+    pegawaiId: 'peg-7',
+    pegawaiNama: 'Bidan Nurhaliza, S.Tr.Keb',
+    nip: '199209182015032007',
+    jabatan: 'Bidan Pelaksana KIA / Koordinator Ibu Hamil',
+    tempatTugas: 'Puskesmas Kepulauan Seribu Selatan',
+    kegiatan: 'Dinas Luar Akhir',
+    detail: 'Selesai pendampingan 3 ibu hamil risti, tensi darah stabil, dan vitamin tablet tambah darah telah diberikan',
+    lokasi: 'Dermaga Penyeberangan Pulau Tidung',
+    alamatLokasi: 'Jl. Dermaga Pelabuhan Utama RT 01/RW 02, Kel. Pulau Tidung, Kec. Kepulauan Seribu Selatan',
+    fotoUrl: 'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=400&auto=format&fit=crop&q=80',
+    coordinates: { lat: -5.8005, lng: 106.5248 }
+  },
+  {
+    id: 'lap-6',
+    timestamp: '06:15',
+    date: 'Hari ini',
+    isoDate: '2026-10-23',
+    pegawaiId: 'peg-18',
+    pegawaiNama: 'Perawat Hendra Wijaya, A.Md.Kep',
+    nip: '199103152016021018',
+    jabatan: 'Perawat Pendamping Rujukan Laut',
+    tempatTugas: 'Puskesmas Kepulauan Seribu Selatan',
+    kegiatan: 'Rujukan Pasien Laut',
+    detail: 'Keberangkatan evakuasi medis darurat antar pulau menggunakan Ambulans Bahtera Sehat',
+    lokasi: 'Dermaga Tidung menuju Muara Angke / RSUD Koja',
+    alamatLokasi: 'Wilayah Perairan Gugus Pulau, Kec. Kepulauan Seribu Selatan, DKI Jakarta',
+    fotoUrl: 'https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?w=400&auto=format&fit=crop&q=80',
+    coordinates: { lat: -5.8900, lng: 106.6750 }
+  },
+  {
+    id: 'lap-7',
+    timestamp: '06:40',
+    date: 'Hari ini',
+    isoDate: '2026-10-23',
+    pegawaiId: 'peg-13',
+    pegawaiNama: 'dr. Sarah Permata',
+    nip: '199305102018012013',
+    jabatan: 'Dokter Pustu Untung Jawa',
+    tempatTugas: 'Pustu Untung Jawa',
+    kegiatan: 'Rabu Transportasi',
+    detail: 'Penggunaan Kapal Dishub penyeberangan publik menuju Pustu Untung Jawa (Kepatuhan Transportasi Publik)',
+    lokasi: 'Dermaga Marina Ancol menuju Pustu Untung Jawa',
+    alamatLokasi: 'Jl. Bougenville No. 04 RT 01/RW 01, Kel. Pulau Untung Jawa, Kec. Kepulauan Seribu Selatan',
+    fotoUrl: 'https://images.unsplash.com/photo-1594824813590-77a83d31b742?w=400&auto=format&fit=crop&q=80',
+    coordinates: { lat: -5.9782, lng: 106.7042 }
+  }
+];

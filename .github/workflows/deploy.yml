@@ -1,0 +1,53 @@
+name: Build and Deploy to Hostinger
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-deploy:
+    name: 🚀 Build & Deploy
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v4
+
+      - name: ⚙️ Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: 📦 Install dependencies
+        run: npm install
+
+      - name: 🏗️ Build production application
+        run: npm run build
+
+      # METODE A: Otomatis publish hasil build ke branch 'deploy'
+      # Sehingga di Hostinger Git hPanel, Anda tinggal memilih Branch: 'deploy'
+      - name: 🌿 Publish dist to 'deploy' branch (Untuk Hostinger Git)
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./dist
+          publish_branch: deploy
+          commit_message: "chore: deploy SI NAKHODA production build [skip ci]"
+
+      # METODE B: Otomatis upload via FTP jika secrets FTP diatur di GitHub
+      - name: 🌐 Deploy to Hostinger via FTP (Opsional)
+        if: ${{ secrets.FTP_SERVER != '' && secrets.FTP_USERNAME != '' && secrets.FTP_PASSWORD != '' }}
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          local-dir: ./dist/
+          server-dir: ./public_html/
+          dangerous-clean-slate: false
