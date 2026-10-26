@@ -52,8 +52,11 @@ Dokumen ini memberikan panduan resmi agar aplikasi **SI NAKHODA** tampil sempurn
 
 ---
 
-## 🔑 KREDENSIAL LOGIN ADMIN
-- **NIP**: `12345` (atau `admin`)
-- **Password**: `admin`
-- Tekan tombol **Login Admin** di dalam menu aplikasi (atau tekan tombol pintas keyboard `Ctrl + Shift + A`).
-- Setelah login, semua menu administrasi, pengaturan database Google Apps Script, dan laporan dapat diakses penuh.
+## 🔑 KREDENSIAL LOGIN PENGELOLA / ADMIN
+- **NIP / Username Pengelola**: `198911` (atau `admin`)
+- **Kata Sandi**: `admin`
+- Tekan tombol **Login Admin** di menu aplikasi (atau tekan tombol pintas keyboard `Ctrl + Shift + A`).
+- Setelah login, masuk ke menu **Pengaturan & Integrasi (GAS)**:
+  - Cukup masukkan Webhook URL Google Apps Script Anda **sekali saja**.
+  - Konfigurasi otomatis tersimpan ke server Hostinger & Google Sheets (`Pengaturan_Sistem`), sehingga **seluruh pegawai di perangkat/browser manapun akan otomatis terhubung ke database yang sama**.
+  - Aplikasi otomatis melakukan **auto-refresh setiap 3 detik** untuk menyinkronkan data presensi dan kondisi pegawai secara realtime!

@@ -58,6 +58,14 @@ async function startServer() {
         fs.mkdirSync(dir, { recursive: true });
       }
       fs.writeFileSync(configFilePath, JSON.stringify(updated, null, 2), 'utf-8');
+      try {
+        const publicPath = path.join(__dirname, 'public', 'system_config.json');
+        fs.writeFileSync(publicPath, JSON.stringify(updated, null, 2), 'utf-8');
+        const distConfigPath = path.join(__dirname, 'dist', 'system_config.json');
+        if (fs.existsSync(path.dirname(distConfigPath))) {
+          fs.writeFileSync(distConfigPath, JSON.stringify(updated, null, 2), 'utf-8');
+        }
+      } catch (e2) {}
     } catch (e) {
       console.error('Gagal menulis file konfigurasi server:', e);
     }

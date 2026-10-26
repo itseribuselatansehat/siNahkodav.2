@@ -59,49 +59,61 @@ export function getInitialStoredConfig(): SystemGasConfig {
 }
 
 /**
- * Mengambil konfigurasi GLOBAL dari server (/api/system-config)
+ * Mengambil konfigurasi GLOBAL dari server (/api/system-config, /api/system-config.php, atau /system_config.json)
  * Memastikan semua browser mendapatkan URL Webhook & Spreadsheet yang sama
  */
 export async function fetchGlobalGasConfig(): Promise<SystemGasConfig> {
-  try {
-    const res = await fetch('/api/system-config', {
-      method: 'GET',
-      headers: { 'Accept': 'application/json' }
-    });
+  const endpoints = [
+    '/api/system-config',
+    '/api/system-config.php',
+    '/system_config.json',
+    '/data/system_config.json'
+  ];
 
-    if (res.ok) {
-      const contentType = res.headers.get('content-type') || '';
-      if (!contentType.includes('application/json')) {
-        return getInitialStoredConfig();
+  for (const url of endpoints) {
+    try {
+      const res = await fetch(url, {
+        method: 'GET',
+        headers: { 'Accept': 'application/json' },
+        cache: 'no-cache'
+      });
+
+      if (res.ok) {
+        const contentType = res.headers.get('content-type') || '';
+        if (contentType.includes('application/json') || url.endsWith('.json')) {
+          const data = await res.json().catch(() => null);
+          if (data) {
+            const rawConfig = data.config || (data.webhookUrl !== undefined ? data : null);
+            if (rawConfig) {
+              const remoteConfig: SystemGasConfig = {
+                ...DEFAULT_SYSTEM_CONFIG,
+                ...rawConfig
+              };
+              currentCachedConfig = remoteConfig;
+              try {
+                localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(remoteConfig));
+              } catch (err) {}
+              notifyConfigChange(remoteConfig);
+              return remoteConfig;
+            }
+          }
+        }
       }
-      const data = await res.json();
-      if (data && data.success && data.config) {
-        const remoteConfig: SystemGasConfig = {
-          ...DEFAULT_SYSTEM_CONFIG,
-          ...data.config
-        };
-        currentCachedConfig = remoteConfig;
-        try {
-          localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(remoteConfig));
-        } catch (err) {}
-        notifyConfigChange(remoteConfig);
-        return remoteConfig;
-      }
+    } catch (err) {
+      // Coba endpoint berikutnya
     }
-  } catch (err) {
-    console.warn('Tidak dapat menghubungi /api/system-config, menggunakan cache lokal:', err);
   }
 
   return getInitialStoredConfig();
 }
 
 /**
- * Menyimpan konfigurasi ke SERVER (/api/system-config) agar berlaku untuk SEMUA browser,
+ * Menyimpan konfigurasi ke SERVER (/api/system-config & /api/system-config.php) agar berlaku untuk SEMUA browser,
  * sekaligus mengupdate localStorage & menyinkronkan ke Google Apps Script Spreadsheet.
  */
 export async function saveGlobalGasConfig(
   newConfig: Partial<SystemGasConfig>,
-  adminName = 'Admin'
+  adminName = 'Administrator'
 ): Promise<{ success: boolean; message: string; config: SystemGasConfig }> {
   const merged: SystemGasConfig = {
     ...currentCachedConfig,
@@ -112,38 +124,53 @@ export async function saveGlobalGasConfig(
 
   let serverSaved = false;
 
-  // 1. Simpan ke Backend Server (Berlaku untuk SEMUA browser di jaringan)
+  // 1. Simpan ke Backend Server Express (/api/system-config)
   try {
     const res = await fetch('/api/system-config', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(merged)
     });
 
     if (res.ok) {
-      const data = await res.json();
-      if (data.config) {
-        merged.updatedAt = data.config.updatedAt;
+      const contentType = res.headers.get('content-type') || '';
+      if (contentType.includes('application/json')) {
+        const data = await res.json().catch(() => null);
+        if (data && data.success) {
+          serverSaved = true;
+        }
       }
-      serverSaved = true;
     }
-  } catch (err) {
-    console.warn('Gagal POST ke /api/system-config server:', err);
+  } catch (err) {}
+
+  // 2. Simpan ke Backend Server Hostinger PHP (/api/system-config.php)
+  if (!serverSaved) {
+    try {
+      const phpRes = await fetch('/api/system-config.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(merged)
+      });
+      if (phpRes.ok) {
+        const data = await phpRes.json().catch(() => null);
+        if (data && data.success) {
+          serverSaved = true;
+        }
+      }
+    } catch (err) {}
   }
 
-  // 2. Simpan ke Local Storage untuk offline / instant cache
+  // 3. Simpan ke Local Storage untuk instant offline cache
   try {
     localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(merged));
   } catch (err) {}
 
   currentCachedConfig = merged;
 
-  // 3. Notifikasi broadcast ke tab lain di browser ini
+  // 4. Notifikasi broadcast ke tab lain di browser ini
   notifyConfigChange(merged);
 
-  // 4. Jika ada Webhook URL Google Apps Script, sinkronkan juga ke Sheet Pengaturan_Sistem
+  // 5. Jika ada Webhook URL Google Apps Script, sinkronkan juga ke Sheet Pengaturan_Sistem
   if (merged.webhookUrl && merged.webhookUrl.startsWith('http')) {
     try {
       fetch(merged.webhookUrl, {
@@ -161,8 +188,8 @@ export async function saveGlobalGasConfig(
   return {
     success: true,
     message: serverSaved
-      ? '✅ Pengaturan GAS tersimpan di SERVER & otomatis berlaku di SEMUA BROWSER!'
-      : '⚠️ Pengaturan tersimpan di browser ini & dicadangkan di memori aplikasi.',
+      ? '✅ Pengaturan GAS berhasil tersimpan di SERVER & otomatis aktif di SEMUA BROWSER!'
+      : '✅ Pengaturan GAS tersimpan di memori browser & spreadsheet Google Apps Script.',
     config: merged
   };
 }

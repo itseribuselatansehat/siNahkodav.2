@@ -23,7 +23,7 @@ export const AdminLoginModal: React.FC<AdminLoginModalProps> = ({
 }) => {
   const fallbackAdminUser: Pegawai = (adminUser && adminUser.nama) ? adminUser : {
     id: 'peg-admin',
-    nip: '12345',
+    nip: '198911',
     nama: 'Administrator SI NAKHODA',
     profesi: 'Staf Administrasi',
     jabatan: 'Admin & Koordinator Manajemen',
@@ -35,8 +35,8 @@ export const AdminLoginModal: React.FC<AdminLoginModalProps> = ({
     avatar: 'https://images.unsplash.com/photo-1622253692010-333f2da6031d?w=150&auto=format&fit=crop&q=80'
   };
 
-  const [nip, setNip] = useState('12345');
-  const [password, setPassword] = useState('admin');
+  const [nip, setNip] = useState('');
+  const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
 
   if (!isOpen) return null;
@@ -49,18 +49,19 @@ export const AdminLoginModal: React.FC<AdminLoginModalProps> = ({
     const trimmedPass = password.trim();
 
     const matchedEmployee = pegawaiList.find((p) => p.nip === trimmedNip);
-    const isMasterAdmin = (trimmedNip === '12345' && trimmedPass === 'admin') || (trimmedNip === 'admin' && trimmedPass === 'admin');
+    const isMasterAdmin = (trimmedNip === '198911' && trimmedPass === 'admin') || (trimmedNip === 'admin' && trimmedPass === 'admin');
     const isPegawaiAdmin = matchedEmployee && (matchedEmployee.role === 'admin' || trimmedPass === 'admin');
 
-    if (isMasterAdmin || isPegawaiAdmin || trimmedPass === 'admin') {
+    if (isMasterAdmin || isPegawaiAdmin || (trimmedNip === '198911' && trimmedPass === 'admin')) {
       const selectedAdmin: Pegawai = matchedEmployee || pegawaiList.find((p) => p.role === 'admin') || fallbackAdminUser;
       onAdminLogin({
         ...selectedAdmin,
+        nip: selectedAdmin.nip || '198911',
         role: 'admin'
       });
       onClose();
     } else {
-      setError('NIP atau Password pengelola salah. Gunakan NIP: 12345 dan Password: admin');
+      setError('NIP / Username atau Kata Sandi pengelola salah. Silakan periksa kembali.');
     }
   };
 
@@ -157,7 +158,7 @@ export const AdminLoginModal: React.FC<AdminLoginModalProps> = ({
                   type="text"
                   value={nip}
                   onChange={(e) => setNip(e.target.value)}
-                  placeholder="Masukkan NIP (Demo: 12345)"
+                  placeholder="Masukkan NIP / Username Pengelola"
                   required
                   className="w-full text-xs px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-blue-500 outline-none"
                 />
@@ -171,14 +172,10 @@ export const AdminLoginModal: React.FC<AdminLoginModalProps> = ({
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Masukkan password (Demo: admin)"
+                  placeholder="Masukkan Kata Sandi"
                   required
                   className="w-full text-xs px-3.5 py-2.5 rounded-xl border border-slate-300 focus:border-blue-500 outline-none"
                 />
-              </div>
-
-              <div className="p-2 bg-slate-50 rounded-xl text-[11px] text-slate-500 text-center font-mono">
-                *Demo Cepat: NIP = <strong>12345</strong> | Sandi = <strong>admin</strong>
               </div>
 
               <button

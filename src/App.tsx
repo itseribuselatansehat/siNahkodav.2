@@ -33,7 +33,7 @@ import { PegawaiDirectoryView } from './components/views/PegawaiDirectoryView';
 import { RiwayatView } from './components/views/RiwayatView';
 import { ProfileView } from './components/views/ProfileView';
 import { SettingsIntegrationView } from './components/views/SettingsIntegrationView';
-import { fetchGlobalGasConfig, saveGlobalGasConfig } from './utils/gasConfigService';
+import { fetchGlobalGasConfig, saveGlobalGasConfig, subscribeToGasConfig } from './utils/gasConfigService';
 import { 
   fetchEmployeesFromGAS, 
   clearLocalDummyEmployees 
@@ -68,7 +68,7 @@ function purgeBrowserDummyStorage() {
 
 const DEFAULT_FALLBACK_USER: Pegawai = {
   id: 'peg-admin',
-  nip: '12345',
+  nip: '198911',
   nama: 'Administrator SI NAKHODA',
   profesi: 'Staf Administrasi',
   jabatan: 'Admin & Koordinator Manajemen',
@@ -235,6 +235,14 @@ export default function App() {
         }
       }
     });
+
+    const unsubscribe = subscribeToGasConfig((cfg) => {
+      if (cfg && cfg.webhookUrl) {
+        setGasWebhookInput(cfg.webhookUrl);
+      }
+    });
+
+    return () => unsubscribe();
   }, []);
 
   const handleFetchFromGAS = async (customUrl?: string) => {
@@ -314,8 +322,10 @@ export default function App() {
       }
     });
 
-    // 2. Interval polling 3 detik ke database server
+    // 2. Interval polling 3 detik ke database server & sinkronisasi GAS otomatis
+    let tickCount = 0;
     const dbPollInterval = setInterval(async () => {
+      tickCount++;
       try {
         const res = await fetchAppDatabase();
         if (res.success && res.data && isMounted) {
@@ -323,7 +333,7 @@ export default function App() {
           setDbSyncTime(new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' }));
 
           if (res.hasUpdates) {
-            if (Array.isArray(res.data.pegawai)) {
+            if (Array.isArray(res.data.pegawai) && res.data.pegawai.length > 0) {
               setPegawaiList(res.data.pegawai);
             }
             if (Array.isArray(res.data.movementLogs)) {
@@ -334,6 +344,15 @@ export default function App() {
             }
           }
         }
+
+        // Sinkronisasi background otomatis ke Google Apps Script Spreadsheet (setiap 3 tick / ~9 detik)
+        if (gasWebhookInput && gasWebhookInput.startsWith('http') && tickCount % 3 === 0 && isMounted) {
+          fetchEmployeesFromGAS(gasWebhookInput).then((gasRes) => {
+            if (gasRes.success && gasRes.pegawai && gasRes.pegawai.length > 0 && isMounted) {
+              setPegawaiList(gasRes.pegawai);
+            }
+          }).catch(() => {});
+        }
       } catch (err) {
         if (isMounted) setIsDbConnected(false);
       }
@@ -343,7 +362,7 @@ export default function App() {
       isMounted = false;
       clearInterval(dbPollInterval);
     };
-  }, []);
+  }, [gasWebhookInput]);
 
   // Execute Midnight Reset of all rooms
   const executeMidnightReset = (isManualSimulation = false) => {

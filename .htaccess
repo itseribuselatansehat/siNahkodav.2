@@ -10,6 +10,14 @@ DirectoryIndex dist/index.html index.html index.php
   RewriteBase /
 
   # ----------------------------------------------------------------------------
+  # Rute PHP API Hostinger (Menyimpan Konfigurasi GAS & Database Real-time)
+  # ----------------------------------------------------------------------------
+  RewriteRule ^api/system-config/?$ api/system-config.php [L,QSA]
+  RewriteRule ^api/database/?$ api/database.php [L,QSA]
+  RewriteRule ^dist/api/system-config/?$ dist/api/system-config.php [L,QSA]
+  RewriteRule ^dist/api/database/?$ dist/api/database.php [L,QSA]
+
+  # ----------------------------------------------------------------------------
   # SKENARIO 1: Hostinger Git Deployment (Repo di-clone langsung ke public_html)
   # Jika folder dist/ ada di dalam direktori web:
   # ----------------------------------------------------------------------------

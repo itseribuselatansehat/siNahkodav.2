@@ -274,7 +274,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 onCloseMobile();
               }}
               className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-xl text-xs font-semibold bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 transition-colors shadow-2xs"
-              title="Klik untuk membuka Login Pengelola / Admin (NIP: 12345, Password: admin)"
+              title="Klik untuk membuka Login Pengelola / Admin"
             >
               <Lock className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
               <span>Login Admin / Pengelola</span>

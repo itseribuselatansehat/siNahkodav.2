@@ -13,8 +13,8 @@ export const LoginView: React.FC<LoginViewProps> = ({
   onLoginSuccess,
   onBackToLanding
 }) => {
-  const [nip, setNip] = useState<string>('12345');
-  const [password, setPassword] = useState<string>('admin');
+  const [nip, setNip] = useState<string>('');
+  const [password, setPassword] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
@@ -25,22 +25,23 @@ export const LoginView: React.FC<LoginViewProps> = ({
 
     setTimeout(() => {
       setLoading(false);
-      // Find matching employee by NIP or id
+      const trimmedNip = nip.trim();
       const matched = pegawaiList.find(
-        (p) => p.nip === nip || (nip === '12345' && p.role === 'admin') || (nip === '67890' && p.nip === '67890')
+        (p) => p.nip === trimmedNip || (trimmedNip === '198911' && p.role === 'admin')
       );
 
       const fallbackUser: Pegawai = pegawaiList[0] || {
         id: 'peg-admin',
-        nip: '198207152006041002',
-        nama: 'Admin SI NAKHODA',
-        profesi: 'Tenaga Medis',
-        jabatan: 'Koordinator Puskesmas',
+        nip: '198911',
+        nama: 'Administrator SI NAKHODA',
+        profesi: 'Staf Administrasi',
+        jabatan: 'Admin & Koordinator Manajemen',
         tempatTugas: 'Puskesmas Kepulauan Seribu Selatan',
         role: 'admin',
-        status: 'belum_hadir',
+        status: 'hadir',
         kondisi: 'siap_melayani',
-        telepon: '081299887766'
+        telepon: '081299887766',
+        avatar: 'https://images.unsplash.com/photo-1622253692010-333f2da6031d?w=150&auto=format&fit=crop&q=80'
       };
 
       if (matched) {
@@ -48,27 +49,7 @@ export const LoginView: React.FC<LoginViewProps> = ({
       } else {
         onLoginSuccess(fallbackUser);
       }
-    }, 600);
-  };
-
-  const handleQuickDemo = (demoNip: string) => {
-    setNip(demoNip);
-    setPassword('demo');
-    const matched = pegawaiList.find(
-      (p) => p.nip === demoNip || (demoNip === '12345' && p.role === 'admin')
-    ) || pegawaiList[0] || {
-      id: 'peg-admin',
-      nip: '198207152006041002',
-      nama: 'Admin SI NAKHODA',
-      profesi: 'Tenaga Medis',
-      jabatan: 'Koordinator Puskesmas',
-      tempatTugas: 'Puskesmas Kepulauan Seribu Selatan',
-      role: 'admin',
-      status: 'belum_hadir',
-      kondisi: 'siap_melayani',
-      telepon: '081299887766'
-    };
-    onLoginSuccess(matched);
+    }, 400);
   };
 
   return (
@@ -148,31 +129,6 @@ export const LoginView: React.FC<LoginViewProps> = ({
             </button>
           </form>
 
-          {/* Quick Demo Logins */}
-          <div className="pt-3 border-t border-slate-100 space-y-2">
-            <div className="text-[11px] font-bold text-slate-400 text-center uppercase tracking-wider">
-              Akses Cepat Demo Persona
-            </div>
-            <div className="grid grid-cols-2 gap-2 text-xs">
-              <button
-                type="button"
-                onClick={() => handleQuickDemo('12345')}
-                className="p-2.5 rounded-xl border border-blue-200 bg-blue-50/60 hover:bg-blue-100/70 text-blue-800 text-left transition"
-              >
-                <div className="font-bold text-[11px]">drg. Ahmad Fauzi</div>
-                <div className="text-[10px] text-blue-600">Admin / Kapus (NIP: 12345)</div>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => handleQuickDemo('67890')}
-                className="p-2.5 rounded-xl border border-emerald-200 bg-emerald-50/60 hover:bg-emerald-100/70 text-emerald-800 text-left transition"
-              >
-                <div className="font-bold text-[11px]">Suster Ani</div>
-                <div className="text-[10px] text-emerald-600">Perawat PTM (NIP: 67890)</div>
-              </button>
-            </div>
-          </div>
         </div>
       </div>
     </div>

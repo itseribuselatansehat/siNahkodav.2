@@ -72,6 +72,29 @@ export async function fetchAppDatabase(): Promise<{
         }
       }
     }
+
+    // Coba endpoint PHP Hostinger
+    const phpRes = await fetch('/api/database.php', {
+      headers: { 'Cache-Control': 'no-cache', Pragma: 'no-cache' }
+    });
+    if (phpRes.ok) {
+      const phpType = phpRes.headers.get('content-type') || '';
+      if (phpType.includes('application/json')) {
+        const json = await phpRes.json();
+        if (json.success && json.data) {
+          const serverTime = json.lastUpdated || json.timestamp || 0;
+          const hasUpdates = serverTime > lastKnownServerTimestamp;
+          if (hasUpdates) {
+            lastKnownServerTimestamp = serverTime;
+          }
+          return {
+            success: true,
+            data: json.data,
+            hasUpdates
+          };
+        }
+      }
+    }
   } catch (err) {
     // Failover ke mode sinkronisasi statis (Hostinger)
   }
