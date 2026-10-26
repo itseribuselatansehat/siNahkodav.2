@@ -14,9 +14,9 @@
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <meta name="apple-mobile-web-app-title" content="SI NAKHODA" />
-    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-    <link rel="icon" type="image/svg+xml" href="/icon.svg" />
-    <link rel="shortcut icon" href="/favicon.ico" />
+    <link rel="apple-touch-icon" href="./apple-touch-icon.png" />
+    <link rel="icon" type="image/svg+xml" href="./icon.svg" />
+    <link rel="shortcut icon" href="./favicon.ico" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -95,7 +95,9 @@
         }, true);
       })();
     </script>
-  </head>
+    <script type="module" crossorigin src="./assets/app.js"></script>
+    <link rel="stylesheet" crossorigin href="./assets/app.css">
+  <link rel="manifest" href="./manifest.webmanifest"><script id="vite-plugin-pwa:register-sw" src="./registerSW.js"></script></head>
   <body class="bg-slate-50 font-['Poppins',sans-serif] text-slate-800 antialiased">
     <div id="root">
       <div style="min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f8fafc; color: #1e293b; padding: 24px; text-align: center;">
@@ -113,7 +115,6 @@
         </div>
       </div>
     </div>
-    <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
 

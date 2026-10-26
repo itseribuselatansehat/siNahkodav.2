@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>SI NAKHODA - Monitoring Posisi & Kondisi Pegawai</title>
+    <meta name="description" content="Sistem Informasi Navigasi Kinerja dan Monitoring Posisi serta Kondisi Pegawai di setiap unit kerja Puskesmas Kepulauan Seribu Selatan secara realtime." />
+    <meta property="og:title" content="SI NAKHODA - Monitoring Posisi & Kondisi Pegawai" />
+    <meta property="og:description" content="Sistem Informasi Navigasi Kinerja dan Monitoring Posisi serta Kondisi Pegawai di setiap unit kerja Puskesmas Kepulauan Seribu Selatan secara realtime." />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="theme-color" content="#2563eb" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="SI NAKHODA" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="icon" type="image/svg+xml" href="/icon.svg" />
+    <link rel="shortcut icon" href="/favicon.ico" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script>
+      (function() {
+        // Safe mock WebSocket for Vite HMR in cloud sandbox environment where HMR WebSocket is disabled
+        if (typeof window !== 'undefined' && window.WebSocket) {
+          var OriginalWebSocket = window.WebSocket;
+          window.WebSocket = function(url, protocols) {
+            if (protocols === 'vite-hmr' || protocols === 'vite-ping') {
+              var listeners = {};
+              var fakeWs = {
+                url: url,
+                readyState: 1, // WebSocket.OPEN
+                OPEN: 1,
+                CLOSED: 3,
+                CONNECTING: 0,
+                CLOSING: 2,
+                send: function() {},
+                close: function() {
+                  fakeWs.readyState = 3;
+                },
+                addEventListener: function(evt, fn) {
+                  if (!listeners[evt]) listeners[evt] = [];
+                  listeners[evt].push(fn);
+                  if (evt === 'open') {
+                    setTimeout(function() {
+                      fakeWs.readyState = 1;
+                      try { fn({ type: 'open' }); } catch(err) {}
+                    }, 0);
+                  }
+                },
+                removeEventListener: function(evt, fn) {
+                  if (listeners[evt]) {
+                    listeners[evt] = listeners[evt].filter(function(f) { return f !== fn; });
+                  }
+                },
+                dispatchEvent: function() { return true; }
+              };
+              return fakeWs;
+            }
+            return new OriginalWebSocket(url, protocols);
+          };
+          window.WebSocket.prototype = OriginalWebSocket.prototype;
+          window.WebSocket.CONNECTING = OriginalWebSocket.CONNECTING;
+          window.WebSocket.OPEN = OriginalWebSocket.OPEN;
+          window.WebSocket.CLOSING = OriginalWebSocket.CLOSING;
+          window.WebSocket.CLOSED = OriginalWebSocket.CLOSED;
+        }
+
+        // Suppress benign Vite HMR websocket disconnect warnings in cloud proxy environment
+        var origConsoleError = console.error;
+        console.error = function() {
+          for (var i = 0; i < arguments.length; i++) {
+            var arg = arguments[i];
+            var str = (arg && (arg.message || arg.stack || (typeof arg === 'string' ? arg : ''))) || '';
+            if (str.indexOf('WebSocket') !== -1 || str.indexOf('[vite]') !== -1) {
+              return;
+            }
+          }
+          return origConsoleError.apply(console, arguments);
+        };
+        window.addEventListener('error', function(e) {
+          var msg = (e && (e.message || (e.error && e.error.message))) || '';
+          if (msg.indexOf('WebSocket') !== -1 || msg.indexOf('[vite]') !== -1) {
+            e.stopImmediatePropagation();
+            if (e.preventDefault) e.preventDefault();
+          }
+        }, true);
+        window.addEventListener('unhandledrejection', function(e) {
+          var reason = (e && e.reason && (e.reason.message || String(e.reason))) || '';
+          if (reason.indexOf('WebSocket') !== -1 || reason.indexOf('[vite]') !== -1) {
+            e.stopImmediatePropagation();
+            if (e.preventDefault) e.preventDefault();
+          }
+        }, true);
+      })();
+    </script>
+  </head>
+  <body class="bg-slate-50 font-['Poppins',sans-serif] text-slate-800 antialiased">
+    <div id="root">
+      <div style="min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f8fafc; color: #1e293b; padding: 24px; text-align: center;">
+        <div style="width: 56px; height: 56px; border-radius: 18px; background: linear-gradient(135deg, #2563eb, #4f46e5); display: flex; align-items: center; justify-content: center; color: white; font-size: 26px; box-shadow: 0 10px 25px -5px rgba(37, 99, 235, 0.35); margin-bottom: 14px;">
+          🚢
+        </div>
+        <div style="font-size: 19px; font-weight: 800; color: #0f172a; margin-bottom: 4px; letter-spacing: -0.025em;">
+          SI NAKHODA
+        </div>
+        <div style="font-size: 12px; font-weight: 600; color: #2563eb; margin-bottom: 16px;">
+          Puskesmas Kecamatan Kepulauan Seribu Selatan
+        </div>
+        <div style="font-size: 11px; color: #64748b;">
+          Memuat Sistem Navigasi & Posisi Pegawai...
+        </div>
+      </div>
+    </div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
+
