@@ -26,29 +26,35 @@ export const LoginView: React.FC<LoginViewProps> = ({
     setTimeout(() => {
       setLoading(false);
       const trimmedNip = nip.trim();
-      const matched = pegawaiList.find(
-        (p) => p.nip === trimmedNip || (trimmedNip === '198911' && p.role === 'admin')
-      );
+      const trimmedPass = password.trim();
 
-      const fallbackUser: Pegawai = pegawaiList[0] || {
-        id: 'peg-admin',
-        nip: '198911',
-        nama: 'Administrator SI NAKHODA',
-        profesi: 'Staf Administrasi',
-        jabatan: 'Admin & Koordinator Manajemen',
-        tempatTugas: 'Puskesmas Kepulauan Seribu Selatan',
-        role: 'admin',
-        status: 'hadir',
-        kondisi: 'siap_melayani',
-        telepon: '081299887766',
-        avatar: 'https://images.unsplash.com/photo-1622253692010-333f2da6031d?w=150&auto=format&fit=crop&q=80'
-      };
+      // 1. Cek Admin Pengelola
+      if ((trimmedNip === '198911' || trimmedNip.toLowerCase() === 'admin') && trimmedPass === 'admin') {
+        onLoginSuccess({
+          id: 'peg-admin',
+          nip: '198911',
+          nama: 'Administrator SI NAKHODA',
+          profesi: 'Staf Administrasi',
+          jabatan: 'Pengelola & Tim Manajemen',
+          tempatTugas: 'Puskesmas Kepulauan Seribu Selatan',
+          role: 'admin',
+          status: 'hadir',
+          kondisi: 'siap_melayani',
+          telepon: '081299887766',
+          avatar: 'https://images.unsplash.com/photo-1622253692010-333f2da6031d?w=150&auto=format&fit=crop&q=80'
+        });
+        return;
+      }
 
+      // 2. Cek Pegawai Terdaftar di Database GAS
+      const matched = pegawaiList.find((p) => p.nip === trimmedNip);
       if (matched) {
         onLoginSuccess(matched);
-      } else {
-        onLoginSuccess(fallbackUser);
+        return;
       }
+
+      // 3. Jika tidak terdaftar, TOLAK LOGIN
+      setErrorMessage('NIP tidak terdaftar dalam database pegawai. Silakan periksa kembali atau hubungi pengelola.');
     }, 400);
   };
 

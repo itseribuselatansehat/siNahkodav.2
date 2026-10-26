@@ -1,25 +1,57 @@
 # ==============================================================================
-# SI NAKHODA - Hostinger / Apache Web Server Configuration (.htaccess)
+# SI NAKHODA - Hostinger LiteSpeed / Apache Dual-Mode Configuration (.htaccess)
 # Puskesmas Kecamatan Kepulauan Seribu Selatan
 # ==============================================================================
 
-# 1. Single Page Application (SPA) Routing Fallback
+DirectoryIndex dist/index.html index.html index.php
+
 <IfModule mod_rewrite.c>
   RewriteEngine On
   RewriteBase /
-  
-  # Jangan rewrite jika file atau direktori fisik memang ada
+
+  # ----------------------------------------------------------------------------
+  # Rute PHP API Hostinger (Menyimpan Konfigurasi GAS & Database Real-time)
+  # ----------------------------------------------------------------------------
+  RewriteRule ^api/system-config/?$ api/system-config.php [L,QSA]
+  RewriteRule ^api/database/?$ api/database.php [L,QSA]
+  RewriteRule ^dist/api/system-config/?$ dist/api/system-config.php [L,QSA]
+  RewriteRule ^dist/api/database/?$ dist/api/database.php [L,QSA]
+
+  # ----------------------------------------------------------------------------
+  # 1. JANGAN REWRITE JIKA FILE ATAU DIREKTORI SUDAH ADA SECARA FISIK
+  # Ini mencegah loop pada file JS/CSS/PNG/SVG/PHP di root maupun di dist/
+  # ----------------------------------------------------------------------------
+  RewriteCond %{REQUEST_FILENAME} -f [OR]
+  RewriteCond %{REQUEST_FILENAME} -d
+  RewriteRule ^ - [L]
+
+  # ----------------------------------------------------------------------------
+  # 2. SKENARIO HOSTINGER GIT CLONE (folder dist/ berada di dalam webroot)
+  # ----------------------------------------------------------------------------
+  # 2.1 Jika request ke root (/), arahkan langsung ke dist/index.html
+  RewriteCond %{DOCUMENT_ROOT}/dist/index.html -f
+  RewriteRule ^$ dist/index.html [L]
+
+  # 2.2 Jika request mengarah ke aset di dist (misal: /assets/app.js)
+  RewriteCond %{DOCUMENT_ROOT}/dist/$1 -f
+  RewriteRule ^(.*)$ dist/$1 [L]
+
+  # 2.3 Routing SPA untuk URL halaman dinamis
+  RewriteCond %{DOCUMENT_ROOT}/dist/index.html -f
+  RewriteRule . /dist/index.html [L]
+
+  # ----------------------------------------------------------------------------
+  # 3. SKENARIO DIRECT UPLOAD (isi folder dist/ di-upload langsung ke public_html)
+  # ----------------------------------------------------------------------------
   RewriteRule ^index\.html$ - [L]
   RewriteCond %{REQUEST_FILENAME} !-f
   RewriteCond %{REQUEST_FILENAME} !-d
-  RewriteCond %{REQUEST_FILENAME} !-l
-  
-  # Arahkan seluruh route lainnya ke index.html
   RewriteRule . /index.html [L]
 </IfModule>
 
-# 2. MIME Types untuk PWA & Modern Web Assets
+# MIME Types agar LiteSpeed tidak menyajikan JavaScript sebagai text/plain
 <IfModule mod_mime.c>
+  AddType text/javascript .js .mjs
   AddType application/javascript .js .mjs
   AddType text/css .css
   AddType application/manifest+json .webmanifest
@@ -29,7 +61,7 @@
   AddType font/woff .woff
 </IfModule>
 
-# 3. Gzip / Deflate Compression untuk Performa Cepat
+# Gzip / Deflate Compression
 <IfModule mod_deflate.c>
   AddOutputFilterByType DEFLATE text/plain
   AddOutputFilterByType DEFLATE text/html
@@ -39,12 +71,13 @@
   AddOutputFilterByType DEFLATE application/xhtml+xml
   AddOutputFilterByType DEFLATE application/rss+xml
   AddOutputFilterByType DEFLATE application/javascript
+  AddOutputFilterByType DEFLATE text/javascript
   AddOutputFilterByType DEFLATE application/x-javascript
   AddOutputFilterByType DEFLATE application/json
   AddOutputFilterByType DEFLATE image/svg+xml
 </IfModule>
 
-# 4. Browser Caching untuk Asset Statis (dist/assets)
+# Browser Caching
 <IfModule mod_expires.c>
   ExpiresActive On
   ExpiresDefault "access plus 1 month"
@@ -56,10 +89,14 @@
   ExpiresByType image/svg+xml "access plus 1 year"
   ExpiresByType text/css "access plus 1 year"
   ExpiresByType application/javascript "access plus 1 year"
+  ExpiresByType text/javascript "access plus 1 year"
 </IfModule>
 
-# 5. Security Headers
+# Security & CORS Headers
 <IfModule mod_headers.c>
+  Header always set Access-Control-Allow-Origin "*"
+  Header always set Access-Control-Allow-Methods "GET, POST, OPTIONS, PUT"
+  Header always set Access-Control-Allow-Headers "Content-Type, Authorization, X-Requested-With, Cache-Control"
   Header always set X-Content-Type-Options "nosniff"
   Header always set X-Frame-Options "SAMEORIGIN"
   Header always set X-XSS-Protection "1; mode=block"

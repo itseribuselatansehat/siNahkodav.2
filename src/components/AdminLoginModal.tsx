@@ -48,20 +48,19 @@ export const AdminLoginModal: React.FC<AdminLoginModalProps> = ({
     const trimmedNip = nip.trim();
     const trimmedPass = password.trim();
 
-    const matchedEmployee = pegawaiList.find((p) => p.nip === trimmedNip);
-    const isMasterAdmin = (trimmedNip === '198911' && trimmedPass === 'admin') || (trimmedNip === 'admin' && trimmedPass === 'admin');
-    const isPegawaiAdmin = matchedEmployee && (matchedEmployee.role === 'admin' || trimmedPass === 'admin');
+    const isMasterAdmin = (trimmedNip === '198911' || trimmedNip.toLowerCase() === 'admin') && trimmedPass === 'admin';
 
-    if (isMasterAdmin || isPegawaiAdmin || (trimmedNip === '198911' && trimmedPass === 'admin')) {
-      const selectedAdmin: Pegawai = matchedEmployee || pegawaiList.find((p) => p.role === 'admin') || fallbackAdminUser;
+    if (isMasterAdmin) {
+      const selectedAdmin: Pegawai = pegawaiList.find((p) => p.role === 'admin' || p.nip === '198911') || fallbackAdminUser;
       onAdminLogin({
         ...selectedAdmin,
-        nip: selectedAdmin.nip || '198911',
+        nip: '198911',
+        nama: selectedAdmin.nama || 'Administrator SI NAKHODA',
         role: 'admin'
       });
       onClose();
     } else {
-      setError('NIP / Username atau Kata Sandi pengelola salah. Silakan periksa kembali.');
+      setError('NIP / Username atau Kata Sandi pengelola salah. Gunakan NIP: 198911 dengan Sandi: admin.');
     }
   };
 

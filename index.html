@@ -113,46 +113,7 @@
         </div>
       </div>
     </div>
-    <script>
-      (function() {
-        var host = (window.location && window.location.hostname) || '';
-        var port = (window.location && window.location.port) || '';
-        var isDev = host.indexOf('run.app') !== -1 || 
-                    host === 'localhost' || 
-                    host === '127.0.0.1' || 
-                    port === '3000';
-
-        if (isDev) {
-          var devScript = document.createElement('script');
-          devScript.type = 'module';
-          devScript.src = '/src/main.tsx';
-          document.body.appendChild(devScript);
-        } else {
-          // Mode Produksi Hostinger: load CSS & JS bundle yang sudah terkompilasi
-          var pathname = (window.location && window.location.pathname) || '/';
-          var basePath = pathname.indexOf('/dist') !== -1 ? '/dist/' : '/';
-
-          var link = document.createElement('link');
-          link.rel = 'stylesheet';
-          link.href = basePath + 'assets/app.css';
-          document.head.appendChild(link);
-
-          var prodScript = document.createElement('script');
-          prodScript.type = 'module';
-          prodScript.crossOrigin = 'anonymous';
-          prodScript.src = basePath + 'assets/app.js';
-          prodScript.onerror = function(err) {
-            console.error('Gagal memuat ' + basePath + 'assets/app.js, mencoba fallback ./assets/app.js', err);
-            var fallback = document.createElement('script');
-            fallback.type = 'module';
-            fallback.crossOrigin = 'anonymous';
-            fallback.src = './assets/app.js';
-            document.body.appendChild(fallback);
-          };
-          document.body.appendChild(prodScript);
-        }
-      })();
-    </script>
+    <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
 

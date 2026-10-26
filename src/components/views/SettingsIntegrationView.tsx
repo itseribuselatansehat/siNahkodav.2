@@ -112,16 +112,29 @@ export const SettingsIntegrationView: React.FC<SettingsIntegrationViewProps> = (
         'Kepala Puskesmas / Pengelola'
       );
 
+      let extraMsg = '';
+      if (gasWebhookUrl.trim()) {
+        try {
+          const empResult = await fetchEmployeesFromGAS(gasWebhookUrl);
+          if (empResult.success && empResult.pegawai && empResult.pegawai.length > 0) {
+            onUpdatePegawaiList(empResult.pegawai);
+            extraMsg = ` Sekaligus berhasil menarik & menghubungkan ${empResult.pegawai.length} data pegawai resmi dari Spreadsheet!`;
+          }
+        } catch (e) {
+          console.warn('Gagal auto fetch pegawai saat simpan:', e);
+        }
+      }
+
       setIsSavingGlobal(false);
       setGlobalSaveFeedback({
         type: 'success',
-        message: 'Konfigurasi telah tersimpan secara GLOBAL di SERVER! Semua browser (Chrome, Edge, Safari, Android, iPhone) kini otomatis menggunakan URL Webhook & Google Drive ini.'
+        message: `Konfigurasi telah tersimpan secara GLOBAL di SERVER! Semua browser (Chrome, Edge, Safari, Android, iPhone) kini otomatis terhubung ke Webhook & Google Drive ini tanpa perlu koneksi ulang.${extraMsg}`
       });
       setLastSyncInfo({
         updatedAt: result.config.updatedAt,
         updatedBy: result.config.updatedBy
       });
-      setTimeout(() => setGlobalSaveFeedback(null), 10000);
+      setTimeout(() => setGlobalSaveFeedback(null), 12000);
     } catch (err: any) {
       setIsSavingGlobal(false);
       setGlobalSaveFeedback({
@@ -568,10 +581,10 @@ export const SettingsIntegrationView: React.FC<SettingsIntegrationViewProps> = (
                     type="button"
                     onClick={handleSaveGasConfig}
                     disabled={isSavingGlobal}
-                    className="flex-1 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white font-bold text-xs shadow-xs transition flex items-center justify-center gap-1.5"
+                    className="flex-1 py-3 px-4 rounded-xl bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 hover:from-blue-700 hover:to-indigo-800 disabled:opacity-50 text-white font-black text-xs shadow-md shadow-blue-500/25 transition flex items-center justify-center gap-2 cursor-pointer"
                   >
-                    <Globe className={`w-3.5 h-3.5 ${isSavingGlobal ? 'animate-spin' : ''}`} />
-                    <span>{isSavingGlobal ? 'Menyimpan ke Server...' : 'Simpan Konfigurasi (Semua Browser)'}</span>
+                    <Globe className={`w-4 h-4 ${isSavingGlobal ? "animate-spin" : ""}`} />
+                    <span>{isSavingGlobal ? "Menyimpan & Menyinkronkan..." : "💾 SIMPAN PENGATURAN GAS & DRIVE (Semua Browser)"}</span>
                   </button>
                   <button
                     type="button"

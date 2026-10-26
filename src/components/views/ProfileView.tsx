@@ -28,39 +28,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
 }) => {
   const badge = getKondisiBadge(currentUser.kondisi);
 
-  // Recommended demo personas for quick switching
-  const demoPersonas = [
-    {
-      id: 'peg-1',
-      roleDesc: 'Kepala Puskesmas (Role: Admin Pimpinan)',
-      note: 'Hak akses penuh pimpinan'
-    },
-    {
-      id: 'peg-5',
-      roleDesc: 'Suster Ani (Role: Perawat Pelaksana PTM)',
-      note: 'Demo pegawai biasa'
-    },
-    {
-      id: 'peg-2',
-      roleDesc: 'dr. Farhan (Dokter IGD - Sedang Tindakan Kritis)',
-      note: 'Demo status tindakan medis'
-    },
-    {
-      id: 'peg-3',
-      roleDesc: 'Perawat Rudi (Perawat IGD - BUTUH BANTUAN SOS)',
-      note: 'Demo status darurat ruangan'
-    },
-    {
-      id: 'peg-17',
-      roleDesc: 'Kapten Arifin (Nahkoda Ambulans Laut Bahtera Sehat)',
-      note: 'Demo armada kapal perairan'
-    },
-    {
-      id: 'peg-23',
-      roleDesc: 'Bidan Nita (Bidan Pustu Pulau Pari)',
-      note: 'Demo pustu kepulauan'
-    }
-  ];
+
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
@@ -159,74 +127,71 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
         </div>
       </div>
 
-      {/* Demo Persona Switcher (Super Useful for evaluation and demo) */}
-      <div className="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-xs space-y-4">
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-xl bg-indigo-100 text-indigo-600 flex items-center justify-center font-bold">
-            <ArrowRightLeft className="w-4 h-4" />
+      {/* Daftar Akun Pegawai Terdaftar */}
+      {pegawaiList.length > 1 && (
+        <div className="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-xs space-y-4">
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 rounded-xl bg-indigo-100 text-indigo-600 flex items-center justify-center font-bold">
+              <ArrowRightLeft className="w-4 h-4" />
+            </div>
+            <div>
+              <h3 className="font-bold text-slate-900 text-base">
+                Pilih Profil Pegawai
+              </h3>
+              <p className="text-xs text-slate-500">
+                Pilih profil Anda dari daftar pegawai yang terdaftar di Google Spreadsheet.
+              </p>
+            </div>
           </div>
-          <div>
-            <h3 className="font-bold text-slate-900 text-base">
-              Beralih Akun Uji Coba (Persona Demo)
-            </h3>
-            <p className="text-xs text-slate-500">
-              Uji coba sistem dari sudut pandang pimpinan puskesmas, dokter IGD, perawat PTM, atau nakes pustu kepulauan.
-            </p>
-          </div>
-        </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          {demoPersonas.map((persona) => {
-            const peg = pegawaiList.find((p) => p.id === persona.id);
-            if (!peg) return null;
-            const isCurrent = peg.id === currentUser.id;
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+            {pegawaiList.slice(0, 12).map((peg) => {
+              const isCurrent = peg.id === currentUser.id || peg.nip === currentUser.nip;
 
-            return (
-              <button
-                key={persona.id}
-                onClick={() => onSelectUser(peg)}
-                className={`p-3.5 rounded-2xl border text-left transition-all flex items-start justify-between gap-3 ${
-                  isCurrent
-                    ? 'border-blue-600 bg-blue-50/70 ring-2 ring-blue-500/30'
-                    : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50'
-                }`}
-              >
-                <div className="flex items-center gap-3 min-w-0">
-                  <img
-                    src={peg.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(peg.nama || 'User')}&background=0284c7&color=fff&bold=true`}
-                    alt={peg.nama || 'User'}
-                    className="w-10 h-10 rounded-xl object-cover shrink-0"
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).src = `https://ui-avatars.com/api/?name=${encodeURIComponent(peg.nama || 'User')}&background=0284c7&color=fff&bold=true`;
-                    }}
-                  />
-                  <div className="min-w-0">
-                    <div className="font-bold text-xs text-slate-900 truncate">
-                      {peg.nama}
-                    </div>
-                    <div className="text-[11px] text-blue-700 font-semibold truncate">
-                      {persona.roleDesc}
-                    </div>
-                    <div className="text-[10px] text-slate-400">
-                      {peg.currentTempatKerja || peg.tempatTugas}
-                    </div>
-                  </div>
-                </div>
-
-                <span
-                  className={`px-2 py-0.5 rounded text-[10px] font-bold shrink-0 ${
+              return (
+                <button
+                  key={peg.id || peg.nip}
+                  onClick={() => onSelectUser(peg)}
+                  className={`p-3 rounded-2xl border text-left transition-all flex items-center justify-between gap-2.5 ${
                     isCurrent
-                      ? 'bg-blue-600 text-white'
-                      : 'bg-slate-100 text-slate-600'
+                      ? 'border-blue-600 bg-blue-50/70 ring-2 ring-blue-500/30'
+                      : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50'
                   }`}
                 >
-                  {isCurrent ? 'Aktif' : 'Ganti'}
-                </span>
-              </button>
-            );
-          })}
+                  <div className="flex items-center gap-2.5 min-w-0">
+                    <img
+                      src={peg.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(peg.nama || 'User')}&background=0284c7&color=fff&bold=true`}
+                      alt={peg.nama}
+                      className="w-9 h-9 rounded-xl object-cover shrink-0"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).src = `https://ui-avatars.com/api/?name=${encodeURIComponent(peg.nama || 'User')}&background=0284c7&color=fff&bold=true`;
+                      }}
+                    />
+                    <div className="min-w-0">
+                      <div className="font-bold text-xs text-slate-900 truncate">
+                        {peg.nama}
+                      </div>
+                      <div className="text-[11px] text-slate-500 truncate">
+                        {peg.jabatan || peg.profesi}
+                      </div>
+                    </div>
+                  </div>
+
+                  <span
+                    className={`px-2 py-0.5 rounded text-[10px] font-bold shrink-0 ${
+                      isCurrent
+                        ? 'bg-blue-600 text-white'
+                        : 'bg-slate-100 text-slate-600'
+                    }`}
+                  >
+                    {isCurrent ? 'Aktif' : 'Pilih'}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 };

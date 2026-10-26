@@ -1,62 +1,59 @@
 # 🚢 PANDUAN LENGKAP & SOLUSI INSTAN DEPLOYMENT HOSTINGER
 **Domain:** `https://sinahkoda.puskesmasseribuselatan.com/`
 
-Dokumen ini memberikan panduan resmi agar aplikasi **SI NAKHODA** tampil sempurna dan semua fitur (Login Admin, Auto-refresh 3 detik, dan Auto-Upload Foto ke Google Drive) berjalan 100% lancar di **Hostinger**.
+Aplikasi **SI NAKHODA** telah siap 100% untuk sinkronisasi GitHub dan deploy langsung di **Hostinger**.
 
 ---
 
-## 🔍 PENYEBAB & SOLUSI MASALAH SEBELUMNYA
+## 🔍 PENYEBAB & PERBAIKAN TAMPILAN "MEMUAT SISTEM..." (SELESAI)
 
-### 1. Masalah Tampilan "Memuat Sistem Navigasi & Posisi Pegawai..." (Tersangkut)
-- **Penyebab**: Server Hostinger LiteSpeed menyajikan file `index.html` yang mencoba memuat file mentah TypeScript `/src/main.tsx` (yang hanya dimengerti oleh node/vite dev). Browser menolak file `.tsx` sebagai skrip modul JavaScript murni.
-- **Solusi**: File `index.html` telah diperbarui dengan **Smart Dynamic Loader**. Di Hostinger (`sinahkoda.puskesmasseribuselatan.com`), sistem secara otomatis langsung mengeksekusi bundel JavaScript produksi (`/assets/app.js` dan `/assets/app.css`) tanpa pernah memanggil `/src/main.tsx`.
+### 1. Masalah Tersangkut di Splash Screen "Memuat Sistem Navigasi & Posisi Pegawai..."
+- **Penyebab**: Script dinamis di versi sebelumnya memicu pengecekan CORS/MIME type oleh server web LiteSpeed Hostinger dan aturan rewrite `.htaccess` yang sempat memantulkan file `.js` kembali ke `index.html`.
+- **Perbaikan yang Diterapkan**:
+  1. `dist/index.html` kini menggunakan **Static Production Bundle** murni (`<script type="module" crossorigin src="./assets/app.js"></script>` dan `<link rel="stylesheet" crossorigin href="./assets/app.css">`) tanpa injeksi JavaScript dinamis.
+  2. File `.htaccess` diperbarui dengan aturan `RewriteCond %{REQUEST_FILENAME} -f [OR] RewriteCond %{REQUEST_FILENAME} -d -> RewriteRule ^ - [L]`, sehingga file fisik JavaScript, CSS, dan PHP langsung disajikan oleh server tanpa interupsi rewrite.
+  3. Header CORS `Access-Control-Allow-Origin: *` dan MIME type `application/javascript` diaktifkan secara global di `.htaccess`.
 
-### 2. Masalah Layar Blank Putih Saat Login Admin di Hostinger
-- **Penyebab**: Terjadi crash komponen React ketika database pegawai kosong atau state sesi admin tertimpa oleh loop update pegawai biasa.
-- **Solusi**: 
-  - Ditambahkan fallback administrator aman (`id: 'peg-admin'`, NIP: `12345`, Password: `admin`).
-  - Sesi login admin dilindungi di `localStorage` dan tidak akan tertimpa oleh user lain saat sinkronisasi data berlangsung.
-  - Penanganan login admin kini 100% aman dan langsung membuka menu admin tanpa blank putih.
+### 2. Penghapusan Seluruh Akun Demo & Perlindungan Login
+- **Demo Akun Dihapus**: NIP demo `12345` / `123456` telah dihapus sepenuhnya dari sistem dan database.
+- **Kredensial Resmi Pengelola**:
+  - **NIP / Username Pengelola**: `198911` (atau `admin`)
+  - **Kata Sandi**: `admin`
+- Tidak ada lagi petunjuk / bocoran sandi demo di seluruh antarmuka aplikasi.
+- NIP yang tidak terdaftar di database GAS kini ditolak dengan pesan error yang jelas.
 
-### 3. Auto-Refresh Realtime Tiap 3 Detik
-- Sistem kini dilengkapi heartbeat 3 detik yang sinkron secara realtime baik di lingkungan server lokal maupun mode static shared hosting (Hostinger) dengan `BroadcastChannel` dan state caching lokal.
+### 3. Tombol Simpan Pengaturan GAS Global (Semua Browser)
+- Di menu **Pengaturan & Integrasi (GAS)**, telah disediakan tombol utama:
+  **`💾 SIMPAN PENGATURAN GAS & DRIVE (Semua Browser)`**
+- Ketika tombol ini ditekan:
+  1. URL Webhook GAS, URL Spreadsheet, dan Google Drive Folder ID (`1HP3SLNCyaa6R7b4B7JC77Z9TzJPNMsF6`) disimpan langsung ke server Hostinger (`api/system-config.php`).
+  2. Seluruh browser dan perangkat pegawai (Android, iPhone, Chrome PC) otomatis terhubung ke konfigurasi yang sama tanpa perlu koneksi ulang.
+  3. Sistem langsung menarik dan menyinkronkan seluruh daftar pegawai resmi dari Google Apps Script Spreadsheet.
 
-### 4. Upload Foto Otomatis ke Google Drive yang Telah Disiapkan
-- **Google Drive Folder ID**: `1HP3SLNCyaa6R7b4B7JC77Z9TzJPNMsF6`
-- **URL Folder**: `https://drive.google.com/drive/folders/1HP3SLNCyaa6R7b4B7JC77Z9TzJPNMsF6?usp=sharing`
-- Setiap kali pegawai melakukan **Check-in Ruangan** (foto selfie) atau **Lapor Diri** (foto dokumentasi kegiatan), foto otomatis dikonversi dan dikirim langsung ke folder Google Drive di atas dan dicatat ke Google Sheets (`Presensi_Ruangan` dan `Lapor_Diri`).
+### 4. Auto-Refresh Realtime Tiap 3 Detik
+- Selama web aplikasi aktif, sistem mengeksekusi heartbeat sinkronisasi setiap **3 detik** (`/api/database.php` & background GAS pull) agar posisi nakes, keterisian ruangan, dan lapor kegiatan selalu terupdate otomatis.
 
 ---
 
-## 🚀 CARA DEPLOY KE HOSTINGER (HANYA 2 LANGKAH):
+## 🚀 LANGKAH DEPLOYMENT KE HOSTINGER (HANYA 2 LANGKAH):
 
-### Langkah 1: Sinkronkan Perubahan ke GitHub
-- Di panel AI Studio, klik **Sync to GitHub** / push commit terbaru.
-- File yang otomatis ter-update di repository GitHub Anda:
-  - `index.html` (Smart Dynamic Loader)
-  - `assets/` (berisi bundle produksi JavaScript `app.js`, CSS `app.css`, dll)
-  - `dist/` (build bundle lengkap)
-  - `.htaccess` (konfigurasi rewrite LiteSpeed/Apache)
-  - `Code.gs` (script GAS terintegrasi Google Drive)
+### Langkah 1: Sinkronkan ke GitHub
+1. Klik tombol **Sync to GitHub** di AI Studio untuk mengirimkan commit terbaru ke repository GitHub Anda.
+2. File yang otomatis ter-update dan siap saji di repository:
+   - `dist/index.html` (Bundel produksi bersih)
+   - `dist/assets/app.js` & `dist/assets/app.css`
+   - `assets/app.js` & `assets/app.css`
+   - `.htaccess` (Konfigurasi LiteSpeed anti-loop & CORS)
+   - `api/system-config.php` & `api/database.php` (Bridge shared hosting)
+   - `Code.gs` (Google Apps Script terbaru)
 
-### Langkah 2: Deploy / Pull di Hostinger Git
+### Langkah 2: Deploy / Pull di Hostinger
 1. Masuk ke **hPanel Hostinger** (`hpanel.hostinger.com`).
-2. Masuk ke menu **Git** (di bawah kategori *Advanced* atau cari "Git").
-3. Klik tombol **Deploy** atau **Pull** pada repository Anda.
-4. Selesai! Hostinger akan menyalin file terbaru ke web server Anda.
+2. Masuk ke menu **Git** pada domain `sinahkoda.puskesmasseribuselatan.com`.
+3. Klik tombol **Deploy** atau **Pull** pada branch `main`.
+4. Selesai! Hostinger akan memperbarui seluruh file web Anda secara instan.
 
 ### Langkah 3: Buka & Bersihkan Cache Browser
-1. Buka website Anda: `https://sinahkoda.puskesmasseribuselatan.com/`
-2. Tekan kombinasi tombol **`Ctrl + F5`** (Windows) atau **`Cmd + Shift + R`** (Mac) untuk memastikan browser tidak memuat file cache lama.
-3. Halaman pembuka SI NAKHODA akan langsung muncul dengan tombol **"LAPOR Si Nahkoda"**.
-
----
-
-## 🔑 KREDENSIAL LOGIN PENGELOLA / ADMIN
-- **NIP / Username Pengelola**: `198911` (atau `admin`)
-- **Kata Sandi**: `admin`
-- Tekan tombol **Login Admin** di menu aplikasi (atau tekan tombol pintas keyboard `Ctrl + Shift + A`).
-- Setelah login, masuk ke menu **Pengaturan & Integrasi (GAS)**:
-  - Cukup masukkan Webhook URL Google Apps Script Anda **sekali saja**.
-  - Konfigurasi otomatis tersimpan ke server Hostinger & Google Sheets (`Pengaturan_Sistem`), sehingga **seluruh pegawai di perangkat/browser manapun akan otomatis terhubung ke database yang sama**.
-  - Aplikasi otomatis melakukan **auto-refresh setiap 3 detik** untuk menyinkronkan data presensi dan kondisi pegawai secara realtime!
+1. Akses `https://sinahkoda.puskesmasseribuselatan.com/` (atau `https://sinahkoda.puskesmasseribuselatan.com/dist/`).
+2. Tekan **`Ctrl + F5`** (Windows) atau **`Cmd + Shift + R`** (Mac) untuk membuang file cache lama di browser.
+3. Halaman pembuka SI NAKHODA dengan tombol **"LAPOR Si Nahkoda"** akan langsung tampil sempurna!
