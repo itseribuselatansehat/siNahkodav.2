@@ -21,6 +21,20 @@ export const AdminLoginModal: React.FC<AdminLoginModalProps> = ({
   adminUser,
   pegawaiList
 }) => {
+  const fallbackAdminUser: Pegawai = (adminUser && adminUser.nama) ? adminUser : {
+    id: 'peg-admin',
+    nip: '12345',
+    nama: 'Administrator SI NAKHODA',
+    profesi: 'Staf Administrasi',
+    jabatan: 'Admin & Koordinator Manajemen',
+    tempatTugas: 'Puskesmas Kepulauan Seribu Selatan',
+    role: 'admin',
+    status: 'hadir',
+    kondisi: 'siap_melayani',
+    telepon: '081299887766',
+    avatar: 'https://images.unsplash.com/photo-1622253692010-333f2da6031d?w=150&auto=format&fit=crop&q=80'
+  };
+
   const [nip, setNip] = useState('12345');
   const [password, setPassword] = useState('admin');
   const [error, setError] = useState<string | null>(null);
@@ -31,14 +45,26 @@ export const AdminLoginModal: React.FC<AdminLoginModalProps> = ({
     e.preventDefault();
     setError(null);
 
-    const admin = pegawaiList.find((p) => p.nip === nip || (nip === '12345' && p.role === 'admin')) || pegawaiList[0];
-    if (nip === '12345' || nip === admin.nip || password === 'admin') {
-      onAdminLogin(admin);
+    const trimmedNip = nip.trim();
+    const trimmedPass = password.trim();
+
+    const matchedEmployee = pegawaiList.find((p) => p.nip === trimmedNip);
+    const isMasterAdmin = (trimmedNip === '12345' && trimmedPass === 'admin') || (trimmedNip === 'admin' && trimmedPass === 'admin');
+    const isPegawaiAdmin = matchedEmployee && (matchedEmployee.role === 'admin' || trimmedPass === 'admin');
+
+    if (isMasterAdmin || isPegawaiAdmin || trimmedPass === 'admin') {
+      const selectedAdmin: Pegawai = matchedEmployee || pegawaiList.find((p) => p.role === 'admin') || fallbackAdminUser;
+      onAdminLogin({
+        ...selectedAdmin,
+        role: 'admin'
+      });
       onClose();
     } else {
       setError('NIP atau Password pengelola salah. Gunakan NIP: 12345 dan Password: admin');
     }
   };
+
+  const activeAdmin = (adminUser && adminUser.nama) ? adminUser : fallbackAdminUser;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/70 backdrop-blur-xs animate-in fade-in">
@@ -80,10 +106,10 @@ export const AdminLoginModal: React.FC<AdminLoginModalProps> = ({
                   ✓ Mode Pengelola Sedang Aktif
                 </span>
                 <h4 className="font-extrabold text-base text-slate-900 mt-2">
-                  {adminUser.nama}
+                  {activeAdmin.nama}
                 </h4>
                 <p className="text-xs text-slate-500 font-mono">
-                  NIP: {adminUser.nip} • {adminUser.jabatan}
+                  NIP: {activeAdmin.nip} • {activeAdmin.jabatan}
                 </p>
               </div>
 

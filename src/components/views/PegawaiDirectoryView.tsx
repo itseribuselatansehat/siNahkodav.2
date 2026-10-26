@@ -34,9 +34,9 @@ export const PegawaiDirectoryView: React.FC<PegawaiDirectoryViewProps> = ({
 
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase();
-      const matchName = p.nama.toLowerCase().includes(q);
-      const matchNip = p.nip.toLowerCase().includes(q);
-      const matchJabatan = p.jabatan.toLowerCase().includes(q);
+      const matchName = (p.nama || '').toLowerCase().includes(q);
+      const matchNip = (p.nip || '').toLowerCase().includes(q);
+      const matchJabatan = (p.jabatan || '').toLowerCase().includes(q);
       if (!matchName && !matchNip && !matchJabatan) return false;
     }
 

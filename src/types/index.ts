@@ -97,6 +97,7 @@ export interface LaporDiriRecord {
   lokasi: string;
   alamatLokasi?: string;
   fotoUrl: string;
+  dokumentasiFoto?: string;
   coordinates?: {
     lat: number;
     lng: number;

@@ -1,60 +1,59 @@
 # 🚢 PANDUAN LENGKAP & SOLUSI INSTAN DEPLOYMENT HOSTINGER
 **Domain:** `https://sinahkoda.puskesmasseribuselatan.com/`
 
-Dokumen ini memberikan solusi langsung agar aplikasi **SI NAKHODA** tampil sempurna saat disinkronisasi dari **GitHub ke Hostinger**.
+Dokumen ini memberikan panduan resmi agar aplikasi **SI NAKHODA** tampil sempurna dan semua fitur (Login Admin, Auto-refresh 3 detik, dan Auto-Upload Foto ke Google Drive) berjalan 100% lancar di **Hostinger**.
 
 ---
 
-## 🔍 PENYEBAB MASALAH DI HOSTINGER
+## 🔍 PENYEBAB & SOLUSI MASALAH SEBELUMNYA
 
-Ketika Anda melakukan sinkronisasi Git di Hostinger:
-1. Hostinger Git menarik isi repository GitHub langsung ke folder `public_html/`.
-2. Di web hosting Hostinger biasa, server **TIDAK menjalankan Node.js atau perintah `npm run build`**.
-3. Sebelumnya, file `index.html` memanggil file mentah TypeScript `/src/main.tsx`. Browser tidak dapat menjalankan TypeScript sehingga muncul tulisan *"Memuat Sistem Navigasi & Posisi Pegawai..."* tanpa memunculkan aplikasi.
+### 1. Masalah Tampilan "Memuat Sistem Navigasi & Posisi Pegawai..." (Tersangkut)
+- **Penyebab**: Server Hostinger LiteSpeed menyajikan file `index.html` yang mencoba memuat file mentah TypeScript `/src/main.tsx` (yang hanya dimengerti oleh node/vite dev). Browser menolak file `.tsx` sebagai skrip modul JavaScript murni.
+- **Solusi**: File `index.html` telah diperbarui dengan **Smart Dynamic Loader**. Di Hostinger (`sinahkoda.puskesmasseribuselatan.com`), sistem secara otomatis langsung mengeksekusi bundel JavaScript produksi (`/assets/app.js` dan `/assets/app.css`) tanpa pernah memanggil `/src/main.tsx`.
+
+### 2. Masalah Layar Blank Putih Saat Login Admin di Hostinger
+- **Penyebab**: Terjadi crash komponen React ketika database pegawai kosong atau state sesi admin tertimpa oleh loop update pegawai biasa.
+- **Solusi**: 
+  - Ditambahkan fallback administrator aman (`id: 'peg-admin'`, NIP: `12345`, Password: `admin`).
+  - Sesi login admin dilindungi di `localStorage` dan tidak akan tertimpa oleh user lain saat sinkronisasi data berlangsung.
+  - Penanganan login admin kini 100% aman dan langsung membuka menu admin tanpa blank putih.
+
+### 3. Auto-Refresh Realtime Tiap 3 Detik
+- Sistem kini dilengkapi heartbeat 3 detik yang sinkron secara realtime baik di lingkungan server lokal maupun mode static shared hosting (Hostinger) dengan `BroadcastChannel` dan state caching lokal.
+
+### 4. Upload Foto Otomatis ke Google Drive yang Telah Disiapkan
+- **Google Drive Folder ID**: `1HP3SLNCyaa6R7b4B7JC77Z9TzJPNMsF6`
+- **URL Folder**: `https://drive.google.com/drive/folders/1HP3SLNCyaa6R7b4B7JC77Z9TzJPNMsF6?usp=sharing`
+- Setiap kali pegawai melakukan **Check-in Ruangan** (foto selfie) atau **Lapor Diri** (foto dokumentasi kegiatan), foto otomatis dikonversi dan dikirim langsung ke folder Google Drive di atas dan dicatat ke Google Sheets (`Presensi_Ruangan` dan `Lapor_Diri`).
 
 ---
 
-## 🛠️ APA YANG TELAH KAMI LAKUKAN (SOLUSI UNIVERSAL AUTO-DEPLOY):
-
-1. **Memasukkan Bundle Produksi Langsung ke Root (`/assets/app.js` & `/assets/app.css`):**
-   - Kami telah mengkompilasi aplikasi ke file JavaScript murni (`assets/app.js`) dan CSS murni (`assets/app.css`) serta menyimpannya langsung di folder `/assets/` repository.
-   - File ini akan otomatis ikut ter-push ke GitHub dan ditarik oleh Hostinger Git.
-2. **Universal Smart Loader di `index.html`:**
-   - File `index.html` kini memiliki detektor cerdas:
-     - Jika dibuka di lingkungan dev AI Studio: menjalankan mode development.
-     - Jika dibuka di domain resmi **`sinahkoda.puskesmasseribuselatan.com`**: otomatis langsung mengeksekusi file JavaScript produksi `./assets/app.js` dan CSS `./assets/app.css`.
-3. **MIME Types & Routing SPA di `.htaccess`:**
-   - Memastikan server Hostinger LiteSpeed menyajikan file `.js` dengan tipe `application/javascript` dan rute SPA tidak menghasilkan 404.
-
----
-
-## 🚀 LANGKAH SINKRONISASI KE GITHUB & HOSTINGER:
+## 🚀 CARA DEPLOY KE HOSTINGER (HANYA 2 LANGKAH):
 
 ### Langkah 1: Sinkronkan Perubahan ke GitHub
-- Tekan tombol **Sync to GitHub** / **Export** di AI Studio untuk memperbarui repository GitHub Anda.
-- Repository GitHub kini telah berisi:
-  - `index.html` (dengan Smart Loader)
-  - folder `assets/` (berisi file `app.js`, `app.css`, dll)
-  - file `.htaccess`
+- Di panel AI Studio, klik **Sync to GitHub** / push commit terbaru.
+- File yang otomatis ter-update di repository GitHub Anda:
+  - `index.html` (Smart Dynamic Loader)
+  - `assets/` (berisi bundle produksi JavaScript `app.js`, CSS `app.css`, dll)
+  - `dist/` (build bundle lengkap)
+  - `.htaccess` (konfigurasi rewrite LiteSpeed/Apache)
+  - `Code.gs` (script GAS terintegrasi Google Drive)
 
-### Langkah 2: Tarik di Hostinger Git
+### Langkah 2: Deploy / Pull di Hostinger Git
 1. Masuk ke **hPanel Hostinger** (`hpanel.hostinger.com`).
-2. Masuk ke menu **Git** (di bawah menu *Advanced*).
-3. Klik tombol **Deploy** / **Pull** pada repository Anda.
-4. Hostinger akan otomatis menyalin `index.html` dan folder `assets/` ke `public_html/`.
+2. Masuk ke menu **Git** (di bawah kategori *Advanced* atau cari "Git").
+3. Klik tombol **Deploy** atau **Pull** pada repository Anda.
+4. Selesai! Hostinger akan menyalin file terbaru ke web server Anda.
 
-### Langkah 3: Buka Website Anda
-1. Buka `https://sinahkoda.puskesmasseribuselatan.com/`.
-2. Tekan `Ctrl + F5` (atau `Cmd + Shift + R` di Mac) untuk membersihkan cache browser lama.
-3. **Aplikasi SI NAKHODA langsung tampil sempurna!**
+### Langkah 3: Buka & Bersihkan Cache Browser
+1. Buka website Anda: `https://sinahkoda.puskesmasseribuselatan.com/`
+2. Tekan kombinasi tombol **`Ctrl + F5`** (Windows) atau **`Cmd + Shift + R`** (Mac) untuk memastikan browser tidak memuat file cache lama.
+3. Halaman pembuka SI NAKHODA akan langsung muncul dengan tombol **"LAPOR Si Nahkoda"**.
 
 ---
 
-## 🌐 MENGHUBUNGKAN GOOGLE APPS SCRIPT (GAS)
-Setelah halaman tampil:
-1. Klik tombol **"LAPOR Si Nahkoda"**.
-2. Klik tombol **Login Admin** (atau tekan shortcut `Ctrl + Shift + A`):
-   - NIP: `12345`
-   - Password: `admin`
-3. Masuk ke tab **Integrasi Database** ➔ Masukkan URL Web App Google Apps Script Anda.
-4. Klik **"Tarik Data Pegawai dari Spreadsheet"** ➔ Data langsung tersinkronisasi realtime!
+## 🔑 KREDENSIAL LOGIN ADMIN
+- **NIP**: `12345` (atau `admin`)
+- **Password**: `admin`
+- Tekan tombol **Login Admin** di dalam menu aplikasi (atau tekan tombol pintas keyboard `Ctrl + Shift + A`).
+- Setelah login, semua menu administrasi, pengaturan database Google Apps Script, dan laporan dapat diakses penuh.

@@ -4,6 +4,7 @@
  */
 
 import { Pegawai } from '../types';
+import { getInitialStoredConfig } from './gasConfigService';
 
 export const CODE_GS_RAW_PATH = '/Code.gs';
 
@@ -242,6 +243,136 @@ export async function syncEmployeesToGAS(webhookUrl: string, pegawaiList: Pegawa
       success: true,
       message: `Sinkronisasi terkirim ke Google Sheets untuk ${pegawaiList.length} data pegawai.`
     };
+  }
+}
+
+/**
+ * Upload foto presensi/laporan langsung ke Google Drive Folder
+ * Folder ID: 1HP3SLNCyaa6R7b4B7JC77Z9TzJPNMsF6
+ */
+export async function uploadPhotoToGoogleDriveGAS(payload: {
+  base64: string;
+  fileName?: string;
+  pegawaiNama: string;
+  nip: string;
+  tempatKerja?: string;
+  unitName?: string;
+  webhookUrl?: string;
+}): Promise<{
+  success: boolean;
+  fileUrl?: string;
+  fileId?: string;
+  message?: string;
+}> {
+  const config = getInitialStoredConfig();
+  const url = (payload.webhookUrl || config.webhookUrl || '').trim();
+
+  if (!url || !url.startsWith('http')) {
+    return {
+      success: false,
+      message: 'URL Google Apps Script belum terhubung.'
+    };
+  }
+
+  try {
+    const cleanBase64 = payload.base64.replace(/^data:image\/[a-z]+;base64,/, '');
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({
+        action: 'uploadPhoto',
+        base64: cleanBase64,
+        fileName: payload.fileName || `presensi_${payload.nip || 'pegawai'}_${Date.now()}.jpg`,
+        pegawaiNama: payload.pegawaiNama,
+        nip: payload.nip,
+        tempatKerja: payload.tempatKerja || '',
+        unitName: payload.unitName || ''
+      })
+    });
+
+    if (res.ok) {
+      const data = await res.json().catch(() => null);
+      if (data && (data.status === 'success' || data.fileUrl)) {
+        return {
+          success: true,
+          fileUrl: data.fileUrl || `https://drive.google.com/drive/folders/${config.folderId || '1HP3SLNCyaa6R7b4B7JC77Z9TzJPNMsF6'}`,
+          fileId: data.fileId,
+          message: 'Foto otomatis tersimpan di Google Drive!'
+        };
+      }
+    }
+  } catch (err: any) {
+    console.warn('Gagal upload foto ke Google Drive:', err);
+  }
+
+  return {
+    success: false,
+    message: 'Gagal mengunggah foto ke Google Drive'
+  };
+}
+
+/**
+ * Catat Check-In ke Google Sheets (Sheet: Presensi_Ruangan)
+ */
+export async function recordCheckInToGAS(payload: {
+  nip: string;
+  pegawaiNama: string;
+  tempatKerja: string;
+  unitName: string;
+  lantai: string;
+  kondisi: string;
+  catatan?: string;
+  fotoUrl?: string;
+  coordinates?: any;
+  webhookUrl?: string;
+}): Promise<boolean> {
+  const config = getInitialStoredConfig();
+  const url = (payload.webhookUrl || config.webhookUrl || '').trim();
+  if (!url || !url.startsWith('http')) return false;
+
+  try {
+    await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({
+        action: 'saveCheckIn',
+        ...payload
+      })
+    });
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
+
+/**
+ * Catat Lapor Diri ke Google Sheets (Sheet: Lapor_Diri)
+ */
+export async function recordLaporDiriToGAS(payload: {
+  nip: string;
+  pegawaiNama: string;
+  kegiatan: string;
+  lokasi: string;
+  catatan?: string;
+  fotoUrl?: string;
+  webhookUrl?: string;
+}): Promise<boolean> {
+  const config = getInitialStoredConfig();
+  const url = (payload.webhookUrl || config.webhookUrl || '').trim();
+  if (!url || !url.startsWith('http')) return false;
+
+  try {
+    await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({
+        action: 'saveLaporDiri',
+        ...payload
+      })
+    });
+    return true;
+  } catch (e) {
+    return false;
   }
 }
 

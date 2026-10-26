@@ -68,13 +68,13 @@ function purgeBrowserDummyStorage() {
 
 const DEFAULT_FALLBACK_USER: Pegawai = {
   id: 'peg-admin',
-  nip: '198207152006041002',
-  nama: 'Admin SI NAKHODA',
-  profesi: 'Dokter Gigi',
-  jabatan: 'Koordinator Puskesmas',
+  nip: '12345',
+  nama: 'Administrator SI NAKHODA',
+  profesi: 'Staf Administrasi',
+  jabatan: 'Admin & Koordinator Manajemen',
   tempatTugas: 'Puskesmas Kepulauan Seribu Selatan',
   role: 'admin',
-  status: 'belum_hadir',
+  status: 'hadir',
   kondisi: 'siap_melayani',
   telepon: '081299887766',
   avatar: 'https://images.unsplash.com/photo-1622253692010-333f2da6031d?w=150&auto=format&fit=crop&q=80'
@@ -128,24 +128,25 @@ export default function App() {
   const [isFetchingGas, setIsFetchingGas] = useState<boolean>(false);
   const [gasFeedback, setGasFeedback] = useState<{ type: 'success' | 'warning' | 'error' | 'info'; message: string } | null>(null);
 
-  // Saat pegawaiList berhasil ditarik dari GAS, set currentUser ke pegawai pertama
-  useEffect(() => {
-    if (pegawaiList.length > 0) {
-      const exists = pegawaiList.some((p) => p.id === currentUser.id || p.nip === currentUser.nip);
-      if (!exists || currentUser.id === 'peg-admin') {
-        setCurrentUser(pegawaiList[0]);
-      }
-    }
-  }, [pegawaiList]);
-
-  // Tampilkan single page tentang SI NAKHODA terlebih dahulu sebelum masuk ke aplikasi
-  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
-
   // Hidden admin/pengelola mode
   const [isAdminLoggedIn, setIsAdminLoggedIn] = useState<boolean>(() => {
     return localStorage.getItem('sinakhoda_admin_logged_v3') === 'true';
   });
   const [isAdminModalOpen, setIsAdminModalOpen] = useState<boolean>(false);
+
+  // Saat pegawaiList berhasil ditarik dari GAS, set currentUser ke pegawai pertama jika bukan sesi admin
+  useEffect(() => {
+    if (isAdminLoggedIn) return; // Lindungi sesi admin agar tidak tertimpa pegawai lain
+    if (pegawaiList.length > 0) {
+      const exists = pegawaiList.some((p) => p.id === currentUser.id || p.nip === currentUser.nip);
+      if (!exists && currentUser.role !== 'admin') {
+        setCurrentUser(pegawaiList[0]);
+      }
+    }
+  }, [pegawaiList, isAdminLoggedIn]);
+
+  // Tampilkan single page tentang SI NAKHODA terlebih dahulu sebelum masuk ke aplikasi
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
 
   // Darkmode state
   const [darkMode, setDarkMode] = useState<boolean>(() => {
@@ -670,11 +671,18 @@ export default function App() {
             setIsLoggedIn(true);
             setCurrentUser(admin);
             setCurrentView('dashboard');
+            try {
+              localStorage.setItem('sinakhoda_admin_logged_v3', 'true');
+              localStorage.setItem('sinakhoda_current_user_v3', JSON.stringify(admin));
+            } catch (e) {}
           }}
           onAdminLogout={() => {
             setIsAdminLoggedIn(false);
+            try {
+              localStorage.removeItem('sinakhoda_admin_logged_v3');
+            } catch (e) {}
           }}
-          adminUser={currentUser}
+          adminUser={currentUser.role === 'admin' ? currentUser : (pegawaiList.find((p) => p.role === 'admin') || DEFAULT_FALLBACK_USER)}
           pegawaiList={pegawaiList}
         />
       </>
@@ -926,11 +934,21 @@ export default function App() {
         onAdminLogin={(admin) => {
           setIsAdminLoggedIn(true);
           setCurrentUser(admin);
+          try {
+            localStorage.setItem('sinakhoda_admin_logged_v3', 'true');
+            localStorage.setItem('sinakhoda_current_user_v3', JSON.stringify(admin));
+          } catch (e) {}
         }}
         onAdminLogout={() => {
           setIsAdminLoggedIn(false);
+          try {
+            localStorage.removeItem('sinakhoda_admin_logged_v3');
+          } catch (e) {}
+          if (pegawaiList.length > 0) {
+            setCurrentUser(pegawaiList[0]);
+          }
         }}
-        adminUser={currentUser.role === 'admin' ? currentUser : (pegawaiList.find((p) => p.role === 'admin') || pegawaiList[0])}
+        adminUser={currentUser.role === 'admin' ? currentUser : (pegawaiList.find((p) => p.role === 'admin') || DEFAULT_FALLBACK_USER)}
         pegawaiList={pegawaiList}
       />
     </div>

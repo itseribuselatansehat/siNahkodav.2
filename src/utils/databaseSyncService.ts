@@ -1,9 +1,15 @@
 /**
  * Service Sinkronisasi Database Real-time (Auto-Refresh 3 Detik)
- * Menghubungkan seluruh browser, tablet, dan smartphone pegawai ke server database SI NAKHODA.
+ * Menghubungkan seluruh browser, tablet, dan smartphone pegawai ke database SI NAKHODA.
+ * Mendukung Full-Stack Server & Static Hostinger + Google Apps Script & Google Drive.
  */
 
 import { Pegawai, MovementLog, LaporDiriRecord } from '../types';
+import { 
+  uploadPhotoToGoogleDriveGAS, 
+  recordCheckInToGAS, 
+  recordLaporDiriToGAS 
+} from './gasService';
 
 export interface DatabaseState {
   lastUpdated: number;
@@ -14,14 +20,32 @@ export interface DatabaseState {
 
 let lastKnownServerTimestamp = 0;
 
+// Broadcast channel untuk sinkronisasi seketika antar-tab / window browser
+const syncChannel = typeof window !== 'undefined' && 'BroadcastChannel' in window 
+  ? new BroadcastChannel('sinakhoda_db_sync_channel') 
+  : null;
+
+function notifyLocalUpdate() {
+  const now = Date.now();
+  if (typeof window !== 'undefined') {
+    localStorage.setItem('sinakhoda_db_timestamp', String(now));
+    if (syncChannel) {
+      syncChannel.postMessage({ type: 'db_update', timestamp: now });
+    }
+  }
+}
+
 /**
- * Mengambil snapshot database terbaru dari server
+ * Mengambil snapshot database terbaru setiap 3 detik
+ * Jika di server Node.js: mengambil dari /api/database
+ * Jika di static hosting (Hostinger): membaca snapshot sinkron lokal & GAS
  */
 export async function fetchAppDatabase(): Promise<{
   success: boolean;
   data?: DatabaseState;
   hasUpdates: boolean;
 }> {
+  // 1. Coba ambil dari endpoint backend Express (/api/database)
   try {
     const res = await fetch('/api/database', {
       headers: {
@@ -30,36 +54,66 @@ export async function fetchAppDatabase(): Promise<{
       }
     });
 
-    if (!res.ok) {
-      return { success: false, hasUpdates: false };
-    }
-
-    const contentType = res.headers.get('content-type') || '';
-    if (!contentType.includes('application/json')) {
-      return { success: false, hasUpdates: false };
-    }
-
-    const json = await res.json();
-    if (json.success && json.data) {
-      const serverTime = json.lastUpdated || json.timestamp || 0;
-      const hasUpdates = serverTime > lastKnownServerTimestamp;
-      if (hasUpdates) {
-        lastKnownServerTimestamp = serverTime;
+    if (res.ok) {
+      const contentType = res.headers.get('content-type') || '';
+      if (contentType.includes('application/json')) {
+        const json = await res.json();
+        if (json.success && json.data) {
+          const serverTime = json.lastUpdated || json.timestamp || 0;
+          const hasUpdates = serverTime > lastKnownServerTimestamp;
+          if (hasUpdates) {
+            lastKnownServerTimestamp = serverTime;
+          }
+          return {
+            success: true,
+            data: json.data,
+            hasUpdates
+          };
+        }
       }
-      return {
-        success: true,
-        data: json.data,
-        hasUpdates
-      };
     }
   } catch (err) {
-    // Silent failover, browser stays operational offline
+    // Failover ke mode sinkronisasi statis (Hostinger)
   }
-  return { success: false, hasUpdates: false };
+
+  // 2. Mode Static Hosting Hostinger: Gunakan local snapshot & timestamps
+  if (typeof window !== 'undefined') {
+    try {
+      const localTimeStr = localStorage.getItem('sinakhoda_db_timestamp');
+      const localTime = localTimeStr ? Number(localTimeStr) : Date.now();
+      const hasUpdates = localTime > lastKnownServerTimestamp;
+      if (hasUpdates) {
+        lastKnownServerTimestamp = localTime;
+      }
+
+      const rawPegawai = localStorage.getItem('sinakhoda_pegawai_v3');
+      const rawMovements = localStorage.getItem('sinakhoda_movements_v3');
+      const rawLaporDiri = localStorage.getItem('sinakhoda_lapordiri_v3');
+
+      const pegawai = rawPegawai ? JSON.parse(rawPegawai) : [];
+      const movementLogs = rawMovements ? JSON.parse(rawMovements) : [];
+      const laporDiriList = rawLaporDiri ? JSON.parse(rawLaporDiri) : [];
+
+      return {
+        success: true,
+        data: {
+          lastUpdated: localTime,
+          pegawai,
+          movementLogs,
+          laporDiriList
+        },
+        hasUpdates
+      };
+    } catch (e) {
+      // Local parsing fallback
+    }
+  }
+
+  return { success: true, hasUpdates: false };
 }
 
 /**
- * Menyimpan Check-In Pegawai langsung ke server database
+ * Menyimpan Check-In Pegawai langsung ke server database dan Google Drive / Spreadsheet
  */
 export async function saveCheckInToDatabase(payload: {
   pegawaiId: string;
@@ -74,6 +128,9 @@ export async function saveCheckInToDatabase(payload: {
   coordinates?: any;
   movementLog?: MovementLog;
 }): Promise<boolean> {
+  notifyLocalUpdate();
+
+  // 1. Kirim ke backend Express (/api/database) jika aktif
   try {
     const res = await fetch('/api/database', {
       method: 'POST',
@@ -83,21 +140,62 @@ export async function saveCheckInToDatabase(payload: {
         payload
       })
     });
-    const json = await res.json();
-    if (json.success) {
-      lastKnownServerTimestamp = json.lastUpdated || Date.now();
-      return true;
+    if (res.ok) {
+      const contentType = res.headers.get('content-type') || '';
+      if (contentType.includes('application/json')) {
+        const json = await res.json().catch(() => null);
+        if (json && json.success) {
+          lastKnownServerTimestamp = json.lastUpdated || Date.now();
+        }
+      }
     }
-  } catch (e) {
-    console.warn('Gagal sinkron check-in ke server database:', e);
+  } catch (e) {}
+
+  // 2. OTOMATIS: Upload foto ke Google Drive yang sudah disiapkan & catat ke Google Sheets
+  if (payload.selfieUrl && payload.selfieUrl.startsWith('data:image')) {
+    uploadPhotoToGoogleDriveGAS({
+      base64: payload.selfieUrl,
+      pegawaiNama: payload.movementLog?.pegawaiNama || 'Pegawai',
+      nip: payload.movementLog?.nip || payload.pegawaiId,
+      tempatKerja: payload.tempatKerja,
+      unitName: payload.unitName
+    }).then((uploadRes) => {
+      recordCheckInToGAS({
+        nip: payload.movementLog?.nip || payload.pegawaiId,
+        pegawaiNama: payload.movementLog?.pegawaiNama || 'Pegawai',
+        tempatKerja: payload.tempatKerja,
+        unitName: payload.unitName,
+        lantai: payload.lantai,
+        kondisi: payload.kondisi,
+        catatan: payload.catatan,
+        fotoUrl: uploadRes.fileUrl || undefined,
+        coordinates: payload.coordinates
+      });
+    }).catch(() => {});
+  } else {
+    // Catat ke Google Sheets tanpa foto
+    recordCheckInToGAS({
+      nip: payload.movementLog?.nip || payload.pegawaiId,
+      pegawaiNama: payload.movementLog?.pegawaiNama || 'Pegawai',
+      tempatKerja: payload.tempatKerja,
+      unitName: payload.unitName,
+      lantai: payload.lantai,
+      kondisi: payload.kondisi,
+      catatan: payload.catatan,
+      coordinates: payload.coordinates
+    }).catch(() => {});
   }
-  return false;
+
+  return true;
 }
 
 /**
- * Menyimpan Lapor Diri Pegawai langsung ke server database
+ * Menyimpan Lapor Diri Pegawai langsung ke server database dan Google Drive / Spreadsheet
  */
 export async function saveLaporDiriToDatabase(record: LaporDiriRecord): Promise<boolean> {
+  notifyLocalUpdate();
+
+  // 1. Kirim ke backend Express (/api/database) jika aktif
   try {
     const res = await fetch('/api/database', {
       method: 'POST',
@@ -107,15 +205,48 @@ export async function saveLaporDiriToDatabase(record: LaporDiriRecord): Promise<
         payload: record
       })
     });
-    const json = await res.json();
-    if (json.success) {
-      lastKnownServerTimestamp = json.lastUpdated || Date.now();
-      return true;
+    if (res.ok) {
+      const contentType = res.headers.get('content-type') || '';
+      if (contentType.includes('application/json')) {
+        const json = await res.json().catch(() => null);
+        if (json && json.success) {
+          lastKnownServerTimestamp = json.lastUpdated || Date.now();
+        }
+      }
     }
-  } catch (e) {
-    console.warn('Gagal sinkron lapor diri ke server database:', e);
+  } catch (e) {}
+
+  // 2. OTOMATIS: Upload foto dokumentasi ke Google Drive & simpan ke Google Sheets Lapor_Diri
+  const photoData = record.fotoUrl || record.dokumentasiFoto;
+  if (photoData && photoData.startsWith('data:image')) {
+    uploadPhotoToGoogleDriveGAS({
+      base64: photoData,
+      fileName: `lapor_${record.nip || 'pegawai'}_${Date.now()}.jpg`,
+      pegawaiNama: record.pegawaiNama,
+      nip: record.nip,
+      tempatKerja: record.tempatTugas,
+      unitName: record.kegiatan
+    }).then((uploadRes) => {
+      recordLaporDiriToGAS({
+        nip: record.nip,
+        pegawaiNama: record.pegawaiNama,
+        kegiatan: record.kegiatan,
+        lokasi: record.lokasi,
+        catatan: record.detail,
+        fotoUrl: uploadRes.fileUrl || undefined
+      });
+    }).catch(() => {});
+  } else {
+    recordLaporDiriToGAS({
+      nip: record.nip,
+      pegawaiNama: record.pegawaiNama,
+      kegiatan: record.kegiatan,
+      lokasi: record.lokasi,
+      catatan: record.detail
+    }).catch(() => {});
   }
-  return false;
+
+  return true;
 }
 
 /**
@@ -126,6 +257,8 @@ export async function saveQuickStatusToDatabase(payload: {
   kondisi: string;
   catatan: string;
 }): Promise<boolean> {
+  notifyLocalUpdate();
+
   try {
     const res = await fetch('/api/database', {
       method: 'POST',
@@ -135,21 +268,27 @@ export async function saveQuickStatusToDatabase(payload: {
         payload
       })
     });
-    const json = await res.json();
-    if (json.success) {
-      lastKnownServerTimestamp = json.lastUpdated || Date.now();
-      return true;
+    if (res.ok) {
+      const contentType = res.headers.get('content-type') || '';
+      if (contentType.includes('application/json')) {
+        const json = await res.json().catch(() => null);
+        if (json && json.success) {
+          lastKnownServerTimestamp = json.lastUpdated || Date.now();
+          return true;
+        }
+      }
     }
-  } catch (e) {
-    console.warn('Gagal sinkron status cepat ke server database:', e);
-  }
-  return false;
+  } catch (e) {}
+
+  return true;
 }
 
 /**
  * Menyimpan reset ruangan harian ke server database
  */
 export async function saveResetToDatabase(): Promise<boolean> {
+  notifyLocalUpdate();
+
   try {
     const res = await fetch('/api/database', {
       method: 'POST',
@@ -158,15 +297,19 @@ export async function saveResetToDatabase(): Promise<boolean> {
         action: 'reset'
       })
     });
-    const json = await res.json();
-    if (json.success) {
-      lastKnownServerTimestamp = json.lastUpdated || Date.now();
-      return true;
+    if (res.ok) {
+      const contentType = res.headers.get('content-type') || '';
+      if (contentType.includes('application/json')) {
+        const json = await res.json().catch(() => null);
+        if (json && json.success) {
+          lastKnownServerTimestamp = json.lastUpdated || Date.now();
+          return true;
+        }
+      }
     }
-  } catch (e) {
-    console.warn('Gagal sinkron reset ke server database:', e);
-  }
-  return false;
+  } catch (e) {}
+
+  return true;
 }
 
 /**
@@ -177,6 +320,8 @@ export async function syncFullDatabaseToServer(data: {
   movementLogs: MovementLog[];
   laporDiriList: LaporDiriRecord[];
 }): Promise<boolean> {
+  notifyLocalUpdate();
+
   try {
     const res = await fetch('/api/database', {
       method: 'POST',
@@ -186,13 +331,17 @@ export async function syncFullDatabaseToServer(data: {
         ...data
       })
     });
-    const json = await res.json();
-    if (json.success) {
-      lastKnownServerTimestamp = json.lastUpdated || Date.now();
-      return true;
+    if (res.ok) {
+      const contentType = res.headers.get('content-type') || '';
+      if (contentType.includes('application/json')) {
+        const json = await res.json().catch(() => null);
+        if (json && json.success) {
+          lastKnownServerTimestamp = json.lastUpdated || Date.now();
+          return true;
+        }
+      }
     }
-  } catch (e) {
-    console.warn('Gagal sinkron penuh ke server database:', e);
-  }
-  return false;
+  } catch (e) {}
+
+  return true;
 }

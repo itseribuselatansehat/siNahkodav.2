@@ -3,7 +3,8 @@
  * SI NAKHODA - GOOGLE APPS SCRIPT (GAS) BACKEND & DATABASE SPREADSHEET
  * Sistem Navigasi & Kehadiran Tenaga Medis - Kepulauan Seribu Selatan
  * ============================================================================
- * Folder ID Google Drive: 1RnBhuEfOErrbGqitdhEY0nExeKXVKC7L
+ * Folder ID Google Drive: 1HP3SLNCyaa6R7b4B7JC77Z9TzJPNMsF6
+ * Link Folder: https://drive.google.com/drive/folders/1HP3SLNCyaa6R7b4B7JC77Z9TzJPNMsF6?usp=sharing
  * 
  * CATATAN PENTING:
  * - Kode ini TIDAK MEMILIKI data dummy atau nama pegawai hardcoded!
@@ -30,7 +31,7 @@
  */
 
 // KONFIGURASI GLOBAL
-const DRIVE_FOLDER_ID = "1RnBhuEfOErrbGqitdhEY0nExeKXVKC7L";
+const DRIVE_FOLDER_ID = "1HP3SLNCyaa6R7b4B7JC77Z9TzJPNMsF6";
 const APP_TITLE = "SI NAKHODA - Puskesmas Kepulauan Seribu Selatan";
 
 /**
