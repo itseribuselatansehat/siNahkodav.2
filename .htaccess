@@ -9,32 +9,46 @@ DirectoryIndex dist/index.html index.html index.php
   RewriteEngine On
   RewriteBase /
 
+  # ----------------------------------------------------------------------------
   # Rute PHP API Hostinger (Menyimpan Konfigurasi GAS & Database Real-time)
+  # ----------------------------------------------------------------------------
   RewriteRule ^api/system-config/?$ api/system-config.php [L,QSA]
   RewriteRule ^api/database/?$ api/database.php [L,QSA]
   RewriteRule ^dist/api/system-config/?$ dist/api/system-config.php [L,QSA]
   RewriteRule ^dist/api/database/?$ dist/api/database.php [L,QSA]
 
+  # ----------------------------------------------------------------------------
   # 1. JANGAN PERNAH MENYAJIKAN FILE TS/TSX SECARA LANGSUNG KE BROWSER
+  # ----------------------------------------------------------------------------
   RewriteRule \.(tsx|ts|jsx)$ - [F,L]
 
-  # 2. JIKA FILE FISIK YANG DI-REQUEST BENAR-BENAR ADA, SAJIKAN LANGSUNG TANPA REWRITE
+  # ----------------------------------------------------------------------------
+  # 2. FILE FISIK STATIS: Jika file yang diminta benar-benar ada, sajikan langsung
+  # ----------------------------------------------------------------------------
   RewriteCond %{REQUEST_FILENAME} -f
   RewriteRule ^ - [L]
 
-  # 3. Request ke root domain (/) diarahkan ke dist/index.html
-  RewriteCond %{DOCUMENT_ROOT}/dist/index.html -f
-  RewriteRule ^$ dist/index.html [L]
+  # ----------------------------------------------------------------------------
+  # 3. FOLDER /dist/: Biarkan .htaccess di dalam folder dist/ yang menangani
+  # ----------------------------------------------------------------------------
+  RewriteRule ^dist/ - [L]
 
-  # 4. Jika browser meminta aset dari root (/assets/...), ambil dari dist/assets/
+  # ----------------------------------------------------------------------------
+  # 4. ROOT DOMAIN (/): Alihkan langsung ke /dist/
+  # ----------------------------------------------------------------------------
+  RewriteRule ^$ dist/ [R=302,L]
+
+  # ----------------------------------------------------------------------------
+  # 5. ASSETS FALLBACK: Jika browser meminta /assets/ tapi ada di dist/assets/
+  # ----------------------------------------------------------------------------
   RewriteCond %{DOCUMENT_ROOT}/dist/assets/$1 -f
   RewriteRule ^assets/(.*)$ dist/assets/$1 [L]
 
-  # 5. SPA ROUTING FALLBACK
+  # ----------------------------------------------------------------------------
+  # 6. SPA FALLBACK
+  # ----------------------------------------------------------------------------
   RewriteCond %{DOCUMENT_ROOT}/dist/index.html -f
   RewriteRule . /dist/index.html [L]
-
-  RewriteRule . /index.html [L]
 </IfModule>
 
 # MIME Types agar LiteSpeed tidak menyajikan JavaScript sebagai text/plain
@@ -55,12 +69,8 @@ DirectoryIndex dist/index.html index.html index.php
   AddOutputFilterByType DEFLATE text/html
   AddOutputFilterByType DEFLATE text/xml
   AddOutputFilterByType DEFLATE text/css
-  AddOutputFilterByType DEFLATE application/xml
-  AddOutputFilterByType DEFLATE application/xhtml+xml
-  AddOutputFilterByType DEFLATE application/rss+xml
   AddOutputFilterByType DEFLATE application/javascript
   AddOutputFilterByType DEFLATE text/javascript
-  AddOutputFilterByType DEFLATE application/x-javascript
   AddOutputFilterByType DEFLATE application/json
   AddOutputFilterByType DEFLATE image/svg+xml
 </IfModule>
@@ -71,13 +81,6 @@ DirectoryIndex dist/index.html index.html index.php
   ExpiresDefault "access plus 1 month"
   ExpiresByType text/html "access plus 0 seconds"
   ExpiresByType application/json "access plus 0 seconds"
-  ExpiresByType image/x-icon "access plus 1 year"
-  ExpiresByType image/jpeg "access plus 1 year"
-  ExpiresByType image/png "access plus 1 year"
-  ExpiresByType image/svg+xml "access plus 1 year"
-  ExpiresByType text/css "access plus 1 year"
-  ExpiresByType application/javascript "access plus 1 year"
-  ExpiresByType text/javascript "access plus 1 year"
 </IfModule>
 
 # Security & CORS Headers
@@ -86,7 +89,4 @@ DirectoryIndex dist/index.html index.html index.php
   Header always set Access-Control-Allow-Methods "GET, POST, OPTIONS, PUT"
   Header always set Access-Control-Allow-Headers "Content-Type, Authorization, X-Requested-With, Cache-Control"
   Header always set X-Content-Type-Options "nosniff"
-  Header always set X-Frame-Options "SAMEORIGIN"
-  Header always set X-XSS-Protection "1; mode=block"
-  Header always set Referrer-Policy "strict-origin-when-cross-origin"
 </IfModule>

@@ -110,6 +110,18 @@
           window.location.replace(target);
         }
       })();
+
+      // Bersihkan Service Worker lama dan cache browser kadaluarsa secara instan
+      if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {
+        navigator.serviceWorker.getRegistrations().then(function(regs) {
+          for (var r of regs) { r.unregister(); }
+        });
+        if ('caches' in window) {
+          caches.keys().then(function(names) {
+            for (var name of names) { caches.delete(name); }
+          });
+        }
+      }
     </script>
   </head>
   <body class="bg-slate-50 font-['Poppins',sans-serif] text-slate-800 antialiased">
