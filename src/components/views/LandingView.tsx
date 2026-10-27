@@ -22,7 +22,7 @@ export const LandingView: React.FC<LandingViewProps> = ({
               SI NAKHODA
             </div>
             <div className="text-xs font-semibold text-blue-600">
-              Puskesmas Kec. Kepulauan Seribu Selatan
+              Puskesmas Kepulauan Seribu Selatan
             </div>
           </div>
         </div>

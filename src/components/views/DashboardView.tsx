@@ -155,7 +155,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
               Monitoring Posisi & Kondisi Pegawai
             </h1>
             <p className="text-xs sm:text-sm text-blue-200 mt-1 max-w-2xl leading-relaxed">
-              Memantau persebaran posisi, kesiapan pelayanan, serta respon kondisi darurat tenaga kesehatan di Puskesmas Kecamatan dan seluruh Pustu Kepulauan Seribu Selatan.
+              Memantau persebaran posisi, kesiapan pelayanan, serta respon kondisi darurat tenaga kesehatan di Puskesmas dan seluruh Pustu Kepulauan Seribu Selatan.
             </p>
           </div>
 

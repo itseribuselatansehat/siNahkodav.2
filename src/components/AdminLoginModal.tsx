@@ -80,7 +80,7 @@ export const AdminLoginModal: React.FC<AdminLoginModalProps> = ({
                 Akses Tersembunyi Pengelola & Pimpinan
               </h3>
               <p className="text-[11px] text-cyan-200">
-                Puskesmas Kec. Kepulauan Seribu Selatan
+                Puskesmas Kepulauan Seribu Selatan
               </p>
             </div>
           </div>

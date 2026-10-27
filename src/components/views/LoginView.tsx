@@ -80,7 +80,7 @@ export const LoginView: React.FC<LoginViewProps> = ({
               SI NAKHODA
             </h2>
             <p className="text-xs text-slate-500">
-              Puskesmas Kec. Kepulauan Seribu Selatan
+              Puskesmas Kepulauan Seribu Selatan
             </p>
           </div>
 

@@ -148,7 +148,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           <div 
             onClick={handleSecretTrigger} 
             className="flex items-center gap-3 cursor-pointer select-none group"
-            title="Puskesmas Kec. Kepulauan Seribu Selatan"
+            title="Puskesmas Kepulauan Seribu Selatan"
           >
             <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-cyan-500 flex items-center justify-center text-white shadow-md shadow-blue-500/20 group-hover:scale-105 transition-transform">
               <Ship className="w-6 h-6" />
@@ -298,7 +298,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           <div
             onClick={handleSecretTrigger}
             className="text-center text-[10px] text-slate-400 dark:text-slate-600 cursor-pointer select-none py-0.5 hover:text-slate-600 dark:hover:text-slate-400 transition-colors"
-            title="Puskesmas Kec. Kepulauan Seribu Selatan"
+            title="Puskesmas Kepulauan Seribu Selatan"
           >
             SI NAKHODA v2.6 • Kep. Seribu Selatan
           </div>

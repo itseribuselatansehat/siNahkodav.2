@@ -69,7 +69,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               });
             }}
             className="flex items-center gap-2 cursor-pointer select-none group"
-            title="Puskesmas Kec. Kepulauan Seribu Selatan"
+            title="Puskesmas Kepulauan Seribu Selatan"
           >
             <div className="hidden sm:flex w-9 h-9 rounded-xl bg-gradient-to-tr from-blue-600 to-cyan-500 items-center justify-center text-white shadow-sm shadow-blue-500/20 group-hover:scale-105 transition-transform">
               <Compass className="w-5 h-5" />
@@ -86,7 +86,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 </span>
               </div>
               <p className="text-[11px] text-slate-500 dark:text-slate-400 hidden sm:block truncate max-w-xs md:max-w-md">
-                Puskesmas Kec. Kepulauan Seribu Selatan
+                Puskesmas Kepulauan Seribu Selatan
               </p>
             </div>
           </div>

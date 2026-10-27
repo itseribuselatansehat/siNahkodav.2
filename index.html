@@ -97,18 +97,19 @@
     </script>
     <script type="module" src="/src/main.tsx"></script>
     <script>
-      // Fallback untuk deployment Hostinger Apache / Git Sync:
-      // Jika file mentah /src/main.tsx tidak di-compile (karena server hosting biasa tanpa Node Vite)
-      // dan halaman masih tertahan pada splash screen, otomatis beralih ke hasil build produksi di /dist/
-      setTimeout(function() {
-        var root = document.getElementById('root');
-        if (root && root.innerText && root.innerText.indexOf('Memuat Sistem Navigasi') !== -1) {
-          if (window.location.pathname.indexOf('/dist') === -1) {
-            var target = (window.location.origin + window.location.pathname).replace(/\/?$/, '/dist/');
-            window.location.replace(target);
-          }
+      // Deteksi otomatis Hostinger / Shared Hosting tanpa Node Vite:
+      (function() {
+        if (typeof window === 'undefined') return;
+        var isDevEnv = window.location.port === '3000' || 
+                       window.location.hostname === 'localhost' || 
+                       window.location.hostname === '127.0.0.1' || 
+                       window.location.hostname.indexOf('run.app') !== -1;
+        // Jika berjalan di Hostinger / server produksi dan belum di /dist/, langsung alihkan ke /dist/
+        if (!isDevEnv && window.location.pathname.indexOf('/dist') === -1) {
+          var target = (window.location.origin + window.location.pathname).replace(/\/?$/, '/dist/');
+          window.location.replace(target);
         }
-      }, 1000);
+      })();
     </script>
   </head>
   <body class="bg-slate-50 font-['Poppins',sans-serif] text-slate-800 antialiased">

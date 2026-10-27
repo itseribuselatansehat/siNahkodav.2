@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "tsx server.ts",
-    "build": "vite build && cp .htaccess dist/.htaccess 2>/dev/null && cp -r public/api dist/ 2>/dev/null && cp public/system_config.json dist/ 2>/dev/null || true",
+    "build": "vite build && cp .htaccess dist/.htaccess 2>/dev/null && cp -r public/api dist/ 2>/dev/null && cp public/system_config.json dist/ 2>/dev/null && mkdir -p assets && cp -r dist/assets/* assets/ 2>/dev/null || true",
     "start": "tsx server.ts",
     "preview": "vite preview",
     "clean": "rm -rf dist server.js",
