@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Pegawai, TempatKerja } from '../../types';
+import { Pegawai, TempatKerja, normalizeTempatKerja } from '../../types';
 import { TEMPAT_KERJA_LIST } from '../../data/initialData';
 import { getKondisiBadge } from '../../utils/helpers';
 import { 
@@ -30,7 +30,7 @@ export const PegawaiDirectoryView: React.FC<PegawaiDirectoryViewProps> = ({
 
   const filtered = pegawaiList.filter((p) => {
     if (selectedProfesi !== 'Semua' && p.profesi !== selectedProfesi) return false;
-    if (selectedTempat !== 'Semua' && (p.currentTempatKerja || p.tempatTugas) !== selectedTempat) return false;
+    if (selectedTempat !== 'Semua' && normalizeTempatKerja(p.currentTempatKerja || p.tempatTugas) !== normalizeTempatKerja(selectedTempat)) return false;
 
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase();
@@ -114,7 +114,7 @@ export const PegawaiDirectoryView: React.FC<PegawaiDirectoryViewProps> = ({
             <option value="Semua">Semua Pulau / Fasilitas</option>
             {TEMPAT_KERJA_LIST.map((tk) => (
               <option key={tk.id} value={tk.id}>
-                {tk.pulau}
+                {tk.label}
               </option>
             ))}
           </select>

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Pegawai, UnitPelayanan, MovementLog, TempatKerja, LantaiArea, KondisiPegawai } from '../../types';
+import { Pegawai, UnitPelayanan, MovementLog, TempatKerja, LantaiArea, KondisiPegawai, normalizeTempatKerja } from '../../types';
 import { TEMPAT_KERJA_LIST, UNIT_PELAYANAN_LIST } from '../../data/initialData';
 import { getKondisiBadge } from '../../utils/helpers';
 import { 
@@ -56,6 +56,17 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [selectedUnitDetail, setSelectedUnitDetail] = useState<UnitPelayanan | null>(null);
 
+  // Helper untuk mendapatkan nakes yang aktif check-in di ruangan ini
+  const getOccupants = (unit: UnitPelayanan) => {
+    return pegawaiList.filter((p) => {
+      if (p.status !== 'hadir') return false;
+      const unitMatch = p.currentUnitId === unit.id || 
+        (p.currentUnitName && p.currentUnitName.trim().toLowerCase() === unit.name.trim().toLowerCase());
+      const facilityMatch = normalizeTempatKerja(p.currentTempatKerja || p.tempatTugas) === normalizeTempatKerja(unit.tempatKerja);
+      return unitMatch && facilityMatch;
+    });
+  };
+
   // Stats calculation
   const totalPegawai = pegawaiList.length;
   const sudahCheckin = pegawaiList.filter((p) => p.status === 'hadir').length;
@@ -66,21 +77,20 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
 
   // Filter units
   const filteredUnits = units.filter((unit) => {
-    if (unit.tempatKerja !== selectedTempatKerja) return false;
+    if (normalizeTempatKerja(unit.tempatKerja) !== normalizeTempatKerja(selectedTempatKerja)) return false;
     if (selectedLantai !== 'Semua' && unit.lantai !== selectedLantai) return false;
     
+    const occupants = getOccupants(unit);
+
     // Check search in unit name
     if (searchQuery.trim()) {
       const matchUnit = unit.name.toLowerCase().includes(searchQuery.toLowerCase());
-      // also check if occupants match search
-      const occupants = pegawaiList.filter((p) => p.currentUnitId === unit.id);
       const matchOccupant = occupants.some((o) => o.nama.toLowerCase().includes(searchQuery.toLowerCase()));
       if (!matchUnit && !matchOccupant) return false;
     }
 
     // Filter kondisi
     if (selectedKondisiFilter !== 'Semua') {
-      const occupants = pegawaiList.filter((p) => p.currentUnitId === unit.id);
       if (selectedKondisiFilter === 'kosong') {
         if (occupants.length > 0) return false;
       } else {
@@ -94,7 +104,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
 
   // Unique floors for current workplace
   const availableFloors = Array.from(
-    new Set(units.filter((u) => u.tempatKerja === selectedTempatKerja).map((u) => u.lantai))
+    new Set(units.filter((u) => normalizeTempatKerja(u.tempatKerja) === normalizeTempatKerja(selectedTempatKerja)).map((u) => u.lantai))
   );
 
   return (
@@ -269,9 +279,9 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           </label>
           <div className="flex items-center gap-2 overflow-x-auto pb-1.5 scrollbar-none">
             {TEMPAT_KERJA_LIST.map((tk) => {
-              const isSelected = selectedTempatKerja === tk.id;
+              const isSelected = normalizeTempatKerja(selectedTempatKerja) === normalizeTempatKerja(tk.id);
               const staffInLocation = pegawaiList.filter(
-                (p) => (p.currentTempatKerja || p.tempatTugas) === tk.id && p.status === 'hadir'
+                (p) => normalizeTempatKerja(p.currentTempatKerja || p.tempatTugas) === normalizeTempatKerja(tk.id) && p.status === 'hadir'
               ).length;
 
               return (
@@ -288,7 +298,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                   }`}
                 >
                   <Building2 className={`w-3.5 h-3.5 ${isSelected ? 'text-white' : 'text-slate-500'}`} />
-                  <span>{tk.id === 'Kantor Transit Jakarta' ? 'Kantor Transit Jakarta' : tk.pulau}</span>
+                  <span>{tk.label}</span>
                   <span
                     className={`px-1.5 py-0.2 rounded-full text-[10px] font-bold ${
                       isSelected
@@ -396,9 +406,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3.5">
               {filteredUnits.map((unit) => {
                 // Find occupants in this unit
-                const occupants = pegawaiList.filter(
-                  (p) => p.currentUnitId === unit.id && p.status === 'hadir'
-                );
+                const occupants = getOccupants(unit);
                 const hasTindakan = occupants.some((o) => o.kondisi === 'tindakan_pasien');
                 const isKosong = occupants.length === 0;
 
@@ -610,14 +618,13 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                   Petugas Sedang Berada di Ruangan Ini
                 </div>
 
-                {pegawaiList.filter((p) => p.currentUnitId === selectedUnitDetail.id && p.status === 'hadir').length === 0 ? (
+                {getOccupants(selectedUnitDetail).length === 0 ? (
                   <div className="p-4 rounded-2xl bg-slate-50 text-center text-slate-500 text-xs border border-dashed border-slate-200">
                     Saat ini belum ada tenaga kesehatan yang terdaftar check-in di ruangan ini.
                   </div>
                 ) : (
                   <div className="space-y-2.5">
-                    {pegawaiList
-                      .filter((p) => p.currentUnitId === selectedUnitDetail.id && p.status === 'hadir')
+                    {getOccupants(selectedUnitDetail)
                       .map((p) => {
                         const badge = getKondisiBadge(p.kondisi);
                         return (

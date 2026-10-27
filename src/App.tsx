@@ -349,7 +349,28 @@ export default function App() {
         if (gasWebhookInput && gasWebhookInput.startsWith('http') && tickCount % 3 === 0 && isMounted) {
           fetchEmployeesFromGAS(gasWebhookInput).then((gasRes) => {
             if (gasRes.success && gasRes.pegawai && gasRes.pegawai.length > 0 && isMounted) {
-              setPegawaiList(gasRes.pegawai);
+              setPegawaiList((prev) => {
+                return gasRes.pegawai.map((newP) => {
+                  const existing = prev.find((e) => e.id === newP.id || e.nip === newP.nip);
+                  if (existing && existing.currentUnitId && existing.status === 'hadir') {
+                    return {
+                      ...newP,
+                      status: existing.status,
+                      currentTempatKerja: existing.currentTempatKerja,
+                      currentLantai: existing.currentLantai,
+                      currentUnitId: existing.currentUnitId,
+                      currentUnitName: existing.currentUnitName,
+                      kondisi: existing.kondisi,
+                      kondisiCatatan: existing.kondisiCatatan,
+                      lastCheckinTime: existing.lastCheckinTime,
+                      lastUpdateTime: existing.lastUpdateTime,
+                      selfieUrl: existing.selfieUrl || newP.selfieUrl,
+                      coordinates: existing.coordinates || newP.coordinates
+                    };
+                  }
+                  return newP;
+                });
+              });
             }
           }).catch(() => {});
         }
@@ -547,27 +568,54 @@ export default function App() {
     const targetPegawai = pegawaiList.find((p) => p.id === data.pegawaiId) || currentUser;
 
     // Update in list
-    setPegawaiList((prev) =>
-      prev.map((p) => {
-        if (p.id === data.pegawaiId) {
-          return {
-            ...p,
-            status: data.isDinasLuar ? 'dinas_luar' : 'hadir',
-            currentTempatKerja: data.tempatKerja,
-            currentLantai: data.lantai,
-            currentUnitId: data.unitId,
-            currentUnitName: data.unitName,
-            kondisi: data.kondisi,
-            kondisiCatatan: data.catatan,
-            lastCheckinTime: timeStr,
-            lastUpdateTime: timeStr,
-            selfieUrl: data.selfieUrl,
-            coordinates: data.coordinates
-          };
-        }
-        return p;
-      })
-    );
+    setPegawaiList((prev) => {
+      const exists = prev.some((p) => p.id === data.pegawaiId || p.nip === data.pegawaiId);
+      if (exists) {
+        return prev.map((p) => {
+          if (p.id === data.pegawaiId || p.nip === data.pegawaiId) {
+            return {
+              ...p,
+              status: data.isDinasLuar ? 'dinas_luar' : 'hadir',
+              currentTempatKerja: data.tempatKerja,
+              currentLantai: data.lantai,
+              currentUnitId: data.unitId,
+              currentUnitName: data.unitName,
+              kondisi: data.kondisi,
+              kondisiCatatan: data.catatan,
+              lastCheckinTime: timeStr,
+              lastUpdateTime: timeStr,
+              selfieUrl: data.selfieUrl || p.selfieUrl,
+              coordinates: data.coordinates || p.coordinates
+            };
+          }
+          return p;
+        });
+      } else {
+        const newP: Pegawai = {
+          id: targetPegawai.id || data.pegawaiId,
+          nip: targetPegawai.nip || data.pegawaiId,
+          nama: targetPegawai.nama || 'Pegawai',
+          profesi: targetPegawai.profesi || 'Tenaga Kesehatan',
+          jabatan: targetPegawai.jabatan || 'Staf Pelayanan',
+          tempatTugas: data.tempatKerja,
+          role: targetPegawai.role || 'pegawai',
+          telepon: targetPegawai.telepon || '',
+          avatar: targetPegawai.avatar || 'https://images.unsplash.com/photo-1534528741775?w=150&auto=format&fit=crop&q=80',
+          status: data.isDinasLuar ? 'dinas_luar' : 'hadir',
+          currentTempatKerja: data.tempatKerja,
+          currentLantai: data.lantai,
+          currentUnitId: data.unitId,
+          currentUnitName: data.unitName,
+          kondisi: data.kondisi,
+          kondisiCatatan: data.catatan,
+          lastCheckinTime: timeStr,
+          lastUpdateTime: timeStr,
+          selfieUrl: data.selfieUrl,
+          coordinates: data.coordinates
+        };
+        return [newP, ...prev];
+      }
+    });
 
     // Update current user if matching
     if (currentUser.id === data.pegawaiId) {

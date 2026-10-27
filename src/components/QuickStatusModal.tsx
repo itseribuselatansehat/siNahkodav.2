@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Pegawai, KondisiPegawai, TempatKerja, LantaiArea, UnitPelayanan } from '../types';
+import { Pegawai, KondisiPegawai, TempatKerja, LantaiArea, UnitPelayanan, normalizeTempatKerja } from '../types';
 import { TEMPAT_KERJA_LIST, UNIT_PELAYANAN_LIST } from '../data/initialData';
 import { getKondisiBadge, triggerSuccessConfetti } from '../utils/helpers';
 import { 
@@ -10,8 +10,8 @@ import {
   Coffee, 
   Ship, 
   Moon, 
-  ArrowRight,
-  MessageSquare
+  ArrowRight, 
+  MessageSquare 
 } from 'lucide-react';
 
 interface QuickStatusModalProps {
@@ -37,7 +37,7 @@ export const QuickStatusModal: React.FC<QuickStatusModalProps> = ({
   if (!isOpen) return null;
 
   const [tempatKerja, setTempatKerja] = useState<TempatKerja>(
-    currentUser.currentTempatKerja || currentUser.tempatTugas
+    normalizeTempatKerja(currentUser.currentTempatKerja || currentUser.tempatTugas)
   );
   const [lantai, setLantai] = useState<LantaiArea>(
     currentUser.currentLantai || 'Lantai 1'
@@ -45,7 +45,7 @@ export const QuickStatusModal: React.FC<QuickStatusModalProps> = ({
   
   // Available units based on selected workplace and floor
   const availableUnits = UNIT_PELAYANAN_LIST.filter(
-    (u) => u.tempatKerja === tempatKerja && u.lantai === lantai
+    (u) => normalizeTempatKerja(u.tempatKerja) === normalizeTempatKerja(tempatKerja) && u.lantai === lantai
   );
 
   const [unitId, setUnitId] = useState<string>(
@@ -56,11 +56,12 @@ export const QuickStatusModal: React.FC<QuickStatusModalProps> = ({
 
   // Handle Tempat Kerja Change
   const handleTempatKerjaChange = (tk: TempatKerja) => {
-    setTempatKerja(tk);
+    const normTk = normalizeTempatKerja(tk);
+    setTempatKerja(normTk);
     const defaultLantai: LantaiArea = 'Lantai 1';
     setLantai(defaultLantai);
     const units = UNIT_PELAYANAN_LIST.filter(
-      (u) => u.tempatKerja === tk && u.lantai === defaultLantai
+      (u) => normalizeTempatKerja(u.tempatKerja) === normTk && u.lantai === defaultLantai
     );
     setUnitId(units[0]?.id || '');
   };
@@ -69,7 +70,7 @@ export const QuickStatusModal: React.FC<QuickStatusModalProps> = ({
   const handleLantaiChange = (l: LantaiArea) => {
     setLantai(l);
     const units = UNIT_PELAYANAN_LIST.filter(
-      (u) => u.tempatKerja === tempatKerja && u.lantai === l
+      (u) => normalizeTempatKerja(u.tempatKerja) === normalizeTempatKerja(tempatKerja) && u.lantai === l
     );
     setUnitId(units[0]?.id || '');
   };
@@ -184,7 +185,7 @@ export const QuickStatusModal: React.FC<QuickStatusModalProps> = ({
             >
               {TEMPAT_KERJA_LIST.map((tk) => (
                 <option key={tk.id} value={tk.id}>
-                  {tk.label} ({tk.pulau})
+                  {tk.label}
                 </option>
               ))}
             </select>

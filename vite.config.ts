@@ -57,16 +57,7 @@ export default defineConfig(() => {
     },
     build: {
       outDir: 'dist',
-      rollupOptions: {
-        input: {
-          app: path.resolve(__dirname, 'src/main.tsx'),
-        },
-        output: {
-          entryFileNames: 'assets/app.js',
-          chunkFileNames: 'assets/[name]-[hash].js',
-          assetFileNames: 'assets/app.[ext]',
-        },
-      },
+      emptyOutDir: true,
     },
     server: {
       // HMR is disabled in AI Studio via DISABLE_HMR env var.

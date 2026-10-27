@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Pegawai, UnitPelayanan, LaporDiriRecord, TempatKerja } from '../../types';
+import { Pegawai, UnitPelayanan, LaporDiriRecord, TempatKerja, normalizeTempatKerja } from '../../types';
 import { TEMPAT_KERJA_LIST, UNIT_PELAYANAN_LIST } from '../../data/initialData';
 import { 
   getKondisiBadge, 
@@ -90,11 +90,15 @@ export const MonitoringReportsView: React.FC<MonitoringReportsViewProps> = ({
 
   // --- TAB 1: KETERISIAN RUANGAN DATA ---
   const roomsWithOccupancy = units
-    .filter((u) => selectedTempatKerja === 'Semua' || u.tempatKerja === selectedTempatKerja)
+    .filter((u) => selectedTempatKerja === 'Semua' || normalizeTempatKerja(u.tempatKerja) === normalizeTempatKerja(selectedTempatKerja))
     .map((unit) => {
-      const occupants = pegawaiList.filter(
-        (p) => p.currentUnitId === unit.id && p.status === 'hadir'
-      );
+      const occupants = pegawaiList.filter((p) => {
+        if (p.status !== 'hadir') return false;
+        const unitMatch = p.currentUnitId === unit.id ||
+          (p.currentUnitName && p.currentUnitName.trim().toLowerCase() === unit.name.trim().toLowerCase());
+        const facilityMatch = normalizeTempatKerja(p.currentTempatKerja || p.tempatTugas) === normalizeTempatKerja(unit.tempatKerja);
+        return unitMatch && facilityMatch;
+      });
       const isKosong = occupants.length === 0;
       return {
         ...unit,
@@ -117,10 +121,10 @@ export const MonitoringReportsView: React.FC<MonitoringReportsViewProps> = ({
       return true;
     });
 
-  const totalRuanganCount = units.filter((u) => selectedTempatKerja === 'Semua' || u.tempatKerja === selectedTempatKerja).length;
+  const totalRuanganCount = units.filter((u) => selectedTempatKerja === 'Semua' || normalizeTempatKerja(u.tempatKerja) === normalizeTempatKerja(selectedTempatKerja)).length;
   const ruanganTerisiCount = units
-    .filter((u) => selectedTempatKerja === 'Semua' || u.tempatKerja === selectedTempatKerja)
-    .filter((u) => pegawaiList.some((p) => p.currentUnitId === u.id && p.status === 'hadir')).length;
+    .filter((u) => selectedTempatKerja === 'Semua' || normalizeTempatKerja(u.tempatKerja) === normalizeTempatKerja(selectedTempatKerja))
+    .filter((u) => pegawaiList.some((p) => (p.currentUnitId === u.id || (p.currentUnitName && p.currentUnitName.trim().toLowerCase() === u.name.trim().toLowerCase())) && normalizeTempatKerja(p.currentTempatKerja || p.tempatTugas) === normalizeTempatKerja(u.tempatKerja) && p.status === 'hadir')).length;
   const ruanganKosongCount = totalRuanganCount - ruanganTerisiCount;
   const percentTerisi = totalRuanganCount > 0 ? Math.round((ruanganTerisiCount / totalRuanganCount) * 100) : 0;
 
@@ -128,7 +132,7 @@ export const MonitoringReportsView: React.FC<MonitoringReportsViewProps> = ({
   const pegawaiBelumMasukRuangan = pegawaiList.filter((p) => {
     const isBelum = p.status === 'belum_hadir' || !p.currentUnitId;
     if (!isBelum) return false;
-    if (selectedTempatKerja !== 'Semua' && (p.currentTempatKerja || p.tempatTugas) !== selectedTempatKerja) return false;
+    if (selectedTempatKerja !== 'Semua' && normalizeTempatKerja(p.currentTempatKerja || p.tempatTugas) !== normalizeTempatKerja(selectedTempatKerja)) return false;
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase();
       const matchName = p.nama.toLowerCase().includes(q);

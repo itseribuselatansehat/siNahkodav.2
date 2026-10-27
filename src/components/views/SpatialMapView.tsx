@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Pegawai, UnitPelayanan, TempatKerja, LantaiArea } from '../../types';
+import { Pegawai, UnitPelayanan, TempatKerja, LantaiArea, normalizeTempatKerja } from '../../types';
 import { TEMPAT_KERJA_LIST, UNIT_PELAYANAN_LIST } from '../../data/initialData';
 import { getKondisiBadge } from '../../utils/helpers';
 import { 
@@ -36,13 +36,19 @@ export const SpatialMapView: React.FC<SpatialMapViewProps> = ({
 
   // Filter units for floorplan
   const currentUnits = units.filter(
-    (u) => u.tempatKerja === selectedTempatKerja && u.lantai === selectedLantai
+    (u) => normalizeTempatKerja(u.tempatKerja) === normalizeTempatKerja(selectedTempatKerja) && u.lantai === selectedLantai
   );
 
   // Active room data
   const activeRoom = units.find((u) => u.id === activeRoomId);
   const occupantsInActiveRoom = activeRoom
-    ? pegawaiList.filter((p) => p.currentUnitId === activeRoom.id && p.status === 'hadir')
+    ? pegawaiList.filter((p) => {
+        if (p.status !== 'hadir') return false;
+        const unitMatch = p.currentUnitId === activeRoom.id ||
+          (p.currentUnitName && p.currentUnitName.trim().toLowerCase() === activeRoom.name.trim().toLowerCase());
+        const facilityMatch = normalizeTempatKerja(p.currentTempatKerja || p.tempatTugas) === normalizeTempatKerja(activeRoom.tempatKerja);
+        return unitMatch && facilityMatch;
+      })
     : [];
 
   return (
@@ -112,7 +118,7 @@ export const SpatialMapView: React.FC<SpatialMapViewProps> = ({
                         : 'bg-slate-50 text-slate-700 hover:bg-slate-100 border-slate-200'
                     }`}
                   >
-                    {tk.id === 'Kantor Transit Jakarta' ? 'Kantor Transit Jakarta' : tk.pulau}
+                    {tk.label}
                   </button>
                 ))}
               </div>

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Pegawai, LaporDiriRecord, TempatKerja } from '../../types';
+import { Pegawai, LaporDiriRecord, TempatKerja, normalizeTempatKerja } from '../../types';
 import { TEMPAT_KERJA_LIST } from '../../data/initialData';
 import { triggerSuccessConfetti } from '../../utils/helpers';
 import { 
@@ -63,10 +63,11 @@ export const LaporDiriView: React.FC<LaporDiriViewProps> = ({
   const [kegiatan, setKegiatan] = useState<LaporDiriRecord['kegiatan']>('Apel Pagi');
   const [detail, setDetail] = useState<string>('');
   const [lokasi, setLokasi] = useState<string>('Halaman Utama Puskesmas');
-  const [tempatTugas, setTempatTugas] = useState<TempatKerja>(selectedPegawai.tempatTugas || 'Puskesmas Kepulauan Seribu Selatan');
+  const [tempatTugas, setTempatTugas] = useState<TempatKerja>(normalizeTempatKerja(selectedPegawai.tempatTugas));
 
   // Search query to easily find employee name
   const [searchPegawaiQuery, setSearchPegawaiQuery] = useState<string>('');
+  const [isPegawaiSearchOpen, setIsPegawaiSearchOpen] = useState<boolean>(false);
 
   // Filtered employees by typed query
   const filteredPegawaiList = pegawaiList.filter((p) => {
@@ -140,7 +141,7 @@ export const LaporDiriView: React.FC<LaporDiriViewProps> = ({
     setSelectedPegawaiId(pegId);
     const peg = pegawaiList.find((p) => p.id === pegId);
     if (peg) {
-      setTempatTugas(peg.tempatTugas);
+      setTempatTugas(normalizeTempatKerja(peg.tempatTugas));
     }
   };
 
@@ -213,92 +214,146 @@ export const LaporDiriView: React.FC<LaporDiriViewProps> = ({
             </h3>
 
             <form onSubmit={handleSubmit} className="space-y-4">
-              {/* 1. DROPDOWN PILIH NAMA PEGAWAI (TANPA LOGIN) DENGAN PENCARIAN CEPAT */}
-              <div className="p-3.5 rounded-2xl bg-indigo-50/70 border border-indigo-200 space-y-2.5">
-                <div className="flex items-center justify-between">
-                  <label className="block text-xs font-bold text-indigo-900 uppercase tracking-wider flex items-center gap-1.5">
-                    <User className="w-4 h-4 text-indigo-600" />
-                    <span>1. Pilih Nama Pegawai</span>
-                  </label>
-                  <span className="text-[10px] font-bold text-indigo-700 bg-indigo-100/80 px-2 py-0.5 rounded-full">
-                    {filteredPegawaiList.length} dari {pegawaiList.length} Nakes
-                  </span>
+              {/* 1. KOLOM KETIK PILIH NAMA PEGAWAI (AUTOCOMPLETE LANGSUNG DAPAT DIPILIH) */}
+              <div className="p-3.5 sm:p-4 rounded-2xl bg-indigo-50/70 border border-indigo-200 space-y-3">
+                <div className="relative">
+                  <div className="flex items-center justify-between mb-1.5">
+                    <label className="block text-xs font-bold text-indigo-900 uppercase tracking-wider flex items-center gap-1.5">
+                      <User className="w-4 h-4 text-indigo-600" />
+                      <span>1. Ketik & Pilih Nama Pegawai</span>
+                    </label>
+                    <span className="text-[10px] font-bold text-indigo-700 bg-indigo-100/80 px-2 py-0.5 rounded-full">
+                      {filteredPegawaiList.length} dari {pegawaiList.length} Nakes
+                    </span>
+                  </div>
+
+                  {/* Kolom Ketik Pencarian Nama / NIP Pegawai */}
+                  <div className="relative">
+                    <Search className="w-4 h-4 text-indigo-500 absolute left-3.5 top-3 pointer-events-none" />
+                    <input
+                      type="text"
+                      value={searchPegawaiQuery}
+                      onFocus={() => setIsPegawaiSearchOpen(true)}
+                      onChange={(e) => {
+                        setSearchPegawaiQuery(e.target.value);
+                        setIsPegawaiSearchOpen(true);
+                      }}
+                      placeholder="🔍 Ketik nama lengkap atau NIP untuk memilih..."
+                      className="w-full text-xs font-bold pl-10 pr-10 py-2.5 rounded-xl border-2 border-indigo-300 bg-white text-slate-900 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none shadow-sm placeholder:text-slate-400 transition"
+                    />
+                    {searchPegawaiQuery && (
+                      <button
+                        type="button"
+                        onClick={() => setSearchPegawaiQuery('')}
+                        className="absolute right-3 top-2.5 w-5 h-5 rounded-full bg-slate-200 hover:bg-slate-300 text-slate-600 text-xs flex items-center justify-center font-bold"
+                        title="Hapus pencarian"
+                      >
+                        ✕
+                      </button>
+                    )}
+                  </div>
+
+                  {/* Auto-suggestion Dropdown List saat mengetik atau fokus */}
+                  {isPegawaiSearchOpen && (
+                    <div className="absolute left-0 right-0 top-full mt-1.5 bg-white rounded-2xl border border-indigo-200 shadow-xl max-h-64 overflow-y-auto z-40 p-2 space-y-1 animate-in fade-in">
+                      <div className="flex items-center justify-between px-2.5 py-1 text-[10px] font-bold text-slate-400 uppercase tracking-wider border-b border-slate-100">
+                        <span>Pilih Pegawai dari Hasil Pencarian:</span>
+                        <button
+                          type="button"
+                          onClick={() => setIsPegawaiSearchOpen(false)}
+                          className="text-indigo-600 hover:underline font-bold"
+                        >
+                          Tutup ✕
+                        </button>
+                      </div>
+
+                      {filteredPegawaiList.length === 0 ? (
+                        <div className="p-4 text-center text-xs text-slate-500">
+                          Pegawai dengan kata kunci &quot;{searchPegawaiQuery}&quot; tidak ditemukan.
+                        </div>
+                      ) : (
+                        filteredPegawaiList.slice(0, 15).map((p) => {
+                          const isSelected = p.id === selectedPegawaiId;
+                          return (
+                            <div
+                              key={p.id}
+                              onClick={() => {
+                                handlePegawaiChange(p.id);
+                                setIsPegawaiSearchOpen(false);
+                                setSearchPegawaiQuery('');
+                              }}
+                              className={`p-2 rounded-xl cursor-pointer transition flex items-center justify-between gap-2.5 ${
+                                isSelected
+                                  ? 'bg-indigo-50 border border-indigo-300 text-indigo-950 font-bold'
+                                  : 'hover:bg-slate-50 text-slate-800'
+                              }`}
+                            >
+                              <div className="flex items-center gap-2.5 min-w-0">
+                                <img
+                                  src={p.avatar}
+                                  alt={p.nama}
+                                  className="w-8 h-8 rounded-full object-cover ring-2 ring-indigo-100 shrink-0"
+                                />
+                                <div className="min-w-0">
+                                  <div className="text-xs font-bold text-slate-900 truncate">{p.nama}</div>
+                                  <div className="text-[10px] text-slate-500 font-mono truncate">
+                                    NIP: {p.nip} • {p.profesi}
+                                  </div>
+                                </div>
+                              </div>
+
+                              <div className="text-right shrink-0">
+                                <span className="px-2 py-0.5 rounded text-[9px] font-bold bg-slate-100 text-slate-700 block">
+                                  {p.tempatTugas}
+                                </span>
+                                {isSelected && (
+                                  <span className="text-[9px] text-emerald-600 font-bold mt-0.5 inline-block">
+                                    ✓ Terpilih
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+                          );
+                        })
+                      )}
+                    </div>
+                  )}
                 </div>
 
-                {/* Kolom Pencarian Nama / NIP Pegawai */}
-                <div className="relative">
-                  <Search className="w-4 h-4 text-indigo-500 absolute left-3 top-2.5 pointer-events-none" />
-                  <input
-                    type="text"
-                    value={searchPegawaiQuery}
-                    onChange={(e) => setSearchPegawaiQuery(e.target.value)}
-                    placeholder="🔍 Ketik nama atau NIP pegawai..."
-                    className="w-full text-xs font-semibold pl-9 pr-8 py-2 rounded-xl border border-indigo-300 bg-white text-slate-900 focus:ring-2 focus:ring-indigo-400 outline-none shadow-xs placeholder:text-slate-400"
-                  />
-                  {searchPegawaiQuery && (
+                {/* Auto Display Details Card */}
+                <div className="p-3 bg-white rounded-xl border border-indigo-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs shadow-2xs">
+                  <div className="flex items-center gap-2.5">
+                    <img
+                      src={selectedPegawai.avatar}
+                      alt={selectedPegawai.nama}
+                      className="w-10 h-10 rounded-xl object-cover ring-2 ring-indigo-500/20"
+                    />
+                    <div>
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-[9px] font-extrabold px-1.5 py-0.2 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-300">
+                          ✓ Pegawai Terpilih
+                        </span>
+                      </div>
+                      <div className="font-bold text-slate-900 text-xs sm:text-sm">{selectedPegawai.nama}</div>
+                      <div className="text-[10px] text-slate-500">NIP: {selectedPegawai.nip} • {selectedPegawai.jabatan}</div>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-between sm:justify-end gap-2 pt-2 sm:pt-0 border-t sm:border-t-0 border-slate-100">
+                    <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-indigo-100 text-indigo-800">
+                      {selectedPegawai.tempatTugas}
+                    </span>
                     <button
                       type="button"
-                      onClick={() => setSearchPegawaiQuery('')}
-                      className="absolute right-2.5 top-2 w-5 h-5 rounded-full bg-slate-200 hover:bg-slate-300 text-slate-600 text-xs flex items-center justify-center font-bold"
-                      title="Hapus pencarian"
+                      onClick={() => {
+                        setIsPegawaiSearchOpen(true);
+                        setSearchPegawaiQuery('');
+                      }}
+                      className="px-2.5 py-1 rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs font-bold border border-indigo-200 transition"
                     >
-                      ✕
+                      Ganti Pegawai
                     </button>
-                  )}
-                </div>
-
-                {/* Dropdown Select Pegawai */}
-                <select
-                  value={selectedPegawaiId}
-                  onChange={(e) => handlePegawaiChange(e.target.value)}
-                  className="w-full text-xs font-bold px-3 py-2.5 rounded-xl border border-indigo-300 bg-white text-slate-900 focus:ring-2 focus:ring-indigo-300 outline-none"
-                >
-                  {pegawaiList.length === 0 ? (
-                    <option value={selectedPegawai.id}>
-                      {selectedPegawai.nama} — Menunggu Sinkronisasi Data GAS
-                    </option>
-                  ) : filteredPegawaiList.length === 0 ? (
-                    <option value="" disabled>
-                      Pegawai &quot;{searchPegawaiQuery}&quot; tidak ditemukan. Hapus pencarian.
-                    </option>
-                  ) : (
-                    filteredPegawaiList.map((p) => (
-                      <option key={p.id} value={p.id}>
-                        {p.nama} — {p.profesi} ({p.jabatan}) [{p.tempatTugas}]
-                      </option>
-                    ))
-                  )}
-                </select>
-
-                {/* Quick Selection Pills if searching */}
-                {searchPegawaiQuery.trim().length > 0 && filteredPegawaiList.length > 0 && (
-                  <div className="flex flex-wrap gap-1 max-h-24 overflow-y-auto pt-1">
-                    {filteredPegawaiList.slice(0, 6).map((p) => (
-                      <button
-                        key={p.id}
-                        type="button"
-                        onClick={() => handlePegawaiChange(p.id)}
-                        className={`px-2 py-1 rounded-lg text-[11px] font-semibold transition border ${
-                          p.id === selectedPegawaiId
-                            ? 'bg-indigo-600 text-white border-indigo-700 shadow-2xs'
-                            : 'bg-white hover:bg-indigo-100 text-slate-700 border-indigo-200'
-                        }`}
-                      >
-                        ✓ {p.nama}
-                      </button>
-                    ))}
                   </div>
-                )}
-
-                {/* Auto Display Details */}
-                <div className="p-2.5 bg-white rounded-xl border border-indigo-100 flex items-center justify-between text-xs">
-                  <div>
-                    <div className="font-bold text-slate-900">{selectedPegawai.nama}</div>
-                    <div className="text-[11px] text-slate-500">NIP: {selectedPegawai.nip} • {selectedPegawai.jabatan}</div>
-                  </div>
-                  <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-indigo-100 text-indigo-800">
-                    {selectedPegawai.tempatTugas}
-                  </span>
                 </div>
               </div>
 

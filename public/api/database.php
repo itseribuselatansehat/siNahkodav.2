@@ -92,27 +92,67 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($action === 'checkin' && is_array($payload)) {
         $pegawaiId = isset($payload['pegawaiId']) ? $payload['pegawaiId'] : '';
         $tempatKerja = isset($payload['tempatKerja']) ? $payload['tempatKerja'] : '';
+        $lantai = isset($payload['lantai']) ? $payload['lantai'] : 'Lantai 1';
+        $unitId = isset($payload['unitId']) ? $payload['unitId'] : '';
         $unitName = isset($payload['unitName']) ? $payload['unitName'] : '';
         $kondisi = isset($payload['kondisi']) ? $payload['kondisi'] : 'siap_melayani';
         $catatan = isset($payload['catatan']) ? $payload['catatan'] : '';
         $lastCheckinTime = isset($payload['lastCheckinTime']) ? $payload['lastCheckinTime'] : date('H:i');
         $selfieUrl = isset($payload['selfieUrl']) ? $payload['selfieUrl'] : null;
+        $coordinates = isset($payload['coordinates']) ? $payload['coordinates'] : null;
 
-        // Update pegawai status
+        // Update pegawai status & current room
+        $found = false;
         if (isset($currentDb['pegawai']) && is_array($currentDb['pegawai'])) {
             foreach ($currentDb['pegawai'] as &$p) {
-                if ($p['id'] === $pegawaiId) {
+                $pId = isset($p['id']) ? $p['id'] : '';
+                $pNip = isset($p['nip']) ? $p['nip'] : '';
+                $logNip = (isset($payload['movementLog']) && isset($payload['movementLog']['nip'])) ? $payload['movementLog']['nip'] : '';
+                if ($pId === $pegawaiId || $pNip === $pegawaiId || ($logNip && $pNip === $logNip)) {
                     $p['status'] = 'hadir';
                     $p['currentTempatKerja'] = $tempatKerja;
+                    $p['currentLantai'] = $lantai;
+                    $p['currentUnitId'] = $unitId;
                     $p['currentUnitName'] = $unitName;
                     $p['kondisi'] = $kondisi;
                     $p['kondisiCatatan'] = $catatan;
                     $p['lastCheckinTime'] = $lastCheckinTime;
                     $p['lastUpdateTime'] = $lastCheckinTime;
                     if ($selfieUrl) $p['selfieUrl'] = $selfieUrl;
+                    if ($coordinates) $p['coordinates'] = $coordinates;
+                    $found = true;
                     break;
                 }
             }
+            unset($p);
+        }
+
+        // If employee not in database yet, create them so they appear in dashboard room immediately!
+        if (!$found) {
+            $ml = isset($payload['movementLog']) ? $payload['movementLog'] : [];
+            $newP = [
+                'id' => $pegawaiId ? $pegawaiId : ('peg-' . time()),
+                'nip' => isset($ml['nip']) ? $ml['nip'] : $pegawaiId,
+                'nama' => isset($ml['pegawaiNama']) ? $ml['pegawaiNama'] : 'Pegawai',
+                'profesi' => 'Tenaga Kesehatan',
+                'jabatan' => 'Staf Pelayanan',
+                'tempatTugas' => $tempatKerja,
+                'role' => 'pegawai',
+                'telepon' => '',
+                'avatar' => 'https://images.unsplash.com/photo-1534528741775?w=150&auto=format&fit=crop&q=80',
+                'status' => 'hadir',
+                'kondisi' => $kondisi,
+                'kondisiCatatan' => $catatan,
+                'currentTempatKerja' => $tempatKerja,
+                'currentLantai' => $lantai,
+                'currentUnitId' => $unitId,
+                'currentUnitName' => $unitName,
+                'lastCheckinTime' => $lastCheckinTime,
+                'lastUpdateTime' => $lastCheckinTime,
+                'selfieUrl' => $selfieUrl,
+                'coordinates' => $coordinates
+            ];
+            $currentDb['pegawai'][] = $newP;
         }
 
         // Prepend movement log

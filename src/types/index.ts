@@ -1,9 +1,32 @@
 export type TempatKerja = 
   | 'Puskesmas Kepulauan Seribu Selatan'
+  | 'Puskesmas Pembantu Pulau Untung Jawa'
+  | 'Puskesmas Pembantu Pulau Lancang'
+  | 'Puskesmas Pembantu Pulau Pari'
+  | 'Kantor Transit Jakarta'
+  // Legacy compatibility
   | 'Pustu Untung Jawa'
   | 'Pustu Pulau Pari'
   | 'Pustu Pulau Lancang'
-  | 'Kantor Transit Jakarta';
+  | 'Pulau Tidung'
+  | 'Pulau Untung Jawa'
+  | 'Pulau Lancang'
+  | 'Pulau Pari';
+
+/**
+ * Normalizer untuk memetakan setiap variasi nama dari Google Sheets / database
+ * ke 5 fasilitas kerja resmi.
+ */
+export function normalizeTempatKerja(val?: string): TempatKerja {
+  if (!val) return 'Puskesmas Kepulauan Seribu Selatan';
+  const s = val.toLowerCase().trim();
+  if (s.includes('untung')) return 'Puskesmas Pembantu Pulau Untung Jawa';
+  if (s.includes('lancang')) return 'Puskesmas Pembantu Pulau Lancang';
+  if (s.includes('pari')) return 'Puskesmas Pembantu Pulau Pari';
+  if (s.includes('transit') || s.includes('jakarta') || s.includes('marina')) return 'Kantor Transit Jakarta';
+  if (s.includes('tidung') || s.includes('selatan') || s.includes('puskesmas')) return 'Puskesmas Kepulauan Seribu Selatan';
+  return 'Puskesmas Kepulauan Seribu Selatan';
+}
 
 export type LantaiArea = 'Lantai 1' | 'Lantai 2' | 'Lantai 3' | 'Area Luar / Lapangan';
 

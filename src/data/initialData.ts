@@ -3,32 +3,32 @@ import { Pegawai, UnitPelayanan, MovementLog, LaporDiriRecord, TempatKerja } fro
 export const TEMPAT_KERJA_LIST: { id: TempatKerja; label: string; pulau: string; coords: { lat: number; lng: number } }[] = [
   {
     id: 'Puskesmas Kepulauan Seribu Selatan',
-    label: 'Puskesmas Kec. Kepulauan Seribu Selatan',
-    pulau: 'Pulau Tidung',
+    label: 'Puskesmas Kepulauan Seribu Selatan',
+    pulau: 'Puskesmas Kepulauan Seribu Selatan',
     coords: { lat: -5.7998, lng: 106.5235 }
   },
   {
-    id: 'Pustu Untung Jawa',
-    label: 'Puskesmas Pembantu Untung Jawa',
-    pulau: 'Pulau Untung Jawa',
+    id: 'Puskesmas Pembantu Pulau Untung Jawa',
+    label: 'Puskesmas Pembantu Pulau Untung Jawa',
+    pulau: 'Puskesmas Pembantu Pulau Untung Jawa',
     coords: { lat: -5.9782, lng: 106.7058 }
   },
   {
-    id: 'Pustu Pulau Pari',
+    id: 'Puskesmas Pembantu Pulau Pari',
     label: 'Puskesmas Pembantu Pulau Pari',
-    pulau: 'Pulau Pari',
+    pulau: 'Puskesmas Pembantu Pulau Pari',
     coords: { lat: -5.8601, lng: 106.6186 }
   },
   {
-    id: 'Pustu Pulau Lancang',
+    id: 'Puskesmas Pembantu Pulau Lancang',
     label: 'Puskesmas Pembantu Pulau Lancang',
-    pulau: 'Pulau Lancang',
+    pulau: 'Puskesmas Pembantu Pulau Lancang',
     coords: { lat: -5.9221, lng: 106.5872 }
   },
   {
     id: 'Kantor Transit Jakarta',
     label: 'Kantor Transit Jakarta',
-    pulau: 'Daratan Jakarta (Marina Ancol / Kantor Penghubung)',
+    pulau: 'Kantor Transit Jakarta',
     coords: { lat: -6.1245, lng: 106.8317 }
   }
 ];
@@ -65,38 +65,38 @@ export const UNIT_PELAYANAN_LIST: UnitPelayanan[] = [
   { id: 'pus-l3-aula', name: 'Aula Serbaguna Nakhoda Sehat', tempatKerja: 'Puskesmas Kepulauan Seribu Selatan', lantai: 'Lantai 3', category: 'umum', icon: 'Building2', deskripsi: 'Pertemuan pleno, pembinaan & seminar', kapasitasIdeal: 30 },
   { id: 'pus-l3-server', name: 'Ruang Server IT & Arsip', tempatKerja: 'Puskesmas Kepulauan Seribu Selatan', lantai: 'Lantai 3', category: 'penunjang', icon: 'Server', deskripsi: 'Data center & monitoring CCTV', kapasitasIdeal: 1 },
 
-  // Pustu Untung Jawa - Lantai 1
-  { id: 'uj-l1-loket', name: 'Ruang Loket', tempatKerja: 'Pustu Untung Jawa', lantai: 'Lantai 1', category: 'pelayanan', icon: 'Ticket', deskripsi: 'Pendaftaran & admisi pasien', kapasitasIdeal: 2 },
-  { id: 'uj-l1-farmasi', name: 'Ruang Farmasi', tempatKerja: 'Pustu Untung Jawa', lantai: 'Lantai 1', category: 'penunjang', icon: 'Pill', deskripsi: 'Peracikan obat & farmasi', kapasitasIdeal: 2 },
-  { id: 'uj-l1-triage', name: 'Ruang Pelayanan Awal', tempatKerja: 'Pustu Untung Jawa', lantai: 'Lantai 1', category: 'pelayanan', icon: 'Activity', deskripsi: 'Skrining & tanda vital awal', kapasitasIdeal: 2 },
-  { id: 'uj-l1-kia', name: 'Ruangan KIA', tempatKerja: 'Pustu Untung Jawa', lantai: 'Lantai 1', category: 'pelayanan', icon: 'Baby', deskripsi: 'Kesehatan ibu, anak & imunisasi', kapasitasIdeal: 2 },
-  { id: 'uj-l1-umum', name: 'Ruangan Pelayanan Umum', tempatKerja: 'Pustu Untung Jawa', lantai: 'Lantai 1', category: 'pelayanan', icon: 'Stethoscope', deskripsi: 'Pemeriksaan dokter umum & nakes', kapasitasIdeal: 2 },
-  { id: 'uj-l1-lorong', name: 'Ruang Selasar Lorong Lantai 1', tempatKerja: 'Pustu Untung Jawa', lantai: 'Lantai 1', category: 'umum', icon: 'Footprints', deskripsi: 'Selasar tunggu pasien Lt. 1', kapasitasIdeal: 3 },
+  // Puskesmas Pembantu Pulau Untung Jawa - Lantai 1
+  { id: 'uj-l1-loket', name: 'Ruang Loket', tempatKerja: 'Puskesmas Pembantu Pulau Untung Jawa', lantai: 'Lantai 1', category: 'pelayanan', icon: 'Ticket', deskripsi: 'Pendaftaran & admisi pasien', kapasitasIdeal: 2 },
+  { id: 'uj-l1-farmasi', name: 'Ruang Farmasi', tempatKerja: 'Puskesmas Pembantu Pulau Untung Jawa', lantai: 'Lantai 1', category: 'penunjang', icon: 'Pill', deskripsi: 'Peracikan obat & farmasi', kapasitasIdeal: 2 },
+  { id: 'uj-l1-triage', name: 'Ruang Pelayanan Awal', tempatKerja: 'Puskesmas Pembantu Pulau Untung Jawa', lantai: 'Lantai 1', category: 'pelayanan', icon: 'Activity', deskripsi: 'Skrining & tanda vital awal', kapasitasIdeal: 2 },
+  { id: 'uj-l1-kia', name: 'Ruangan KIA', tempatKerja: 'Puskesmas Pembantu Pulau Untung Jawa', lantai: 'Lantai 1', category: 'pelayanan', icon: 'Baby', deskripsi: 'Kesehatan ibu, anak & imunisasi', kapasitasIdeal: 2 },
+  { id: 'uj-l1-umum', name: 'Ruangan Pelayanan Umum', tempatKerja: 'Puskesmas Pembantu Pulau Untung Jawa', lantai: 'Lantai 1', category: 'pelayanan', icon: 'Stethoscope', deskripsi: 'Pemeriksaan dokter umum & nakes', kapasitasIdeal: 2 },
+  { id: 'uj-l1-lorong', name: 'Ruang Selasar Lorong Lantai 1', tempatKerja: 'Puskesmas Pembantu Pulau Untung Jawa', lantai: 'Lantai 1', category: 'umum', icon: 'Footprints', deskripsi: 'Selasar tunggu pasien Lt. 1', kapasitasIdeal: 3 },
 
-  // Pustu Untung Jawa - Lantai 2
-  { id: 'uj-l2-lab', name: 'Ruang LAB', tempatKerja: 'Pustu Untung Jawa', lantai: 'Lantai 2', category: 'penunjang', icon: 'FlaskConical', deskripsi: 'Pemeriksaan laboratorium sederhana', kapasitasIdeal: 2 },
-  { id: 'uj-l2-gigi', name: 'Ruangan Gigi', tempatKerja: 'Pustu Untung Jawa', lantai: 'Lantai 2', category: 'pelayanan', icon: 'Smile', deskripsi: 'Pemeriksaan & perawatan gigi', kapasitasIdeal: 2 },
-  { id: 'uj-l2-admin', name: 'Ruangan Administrasi', tempatKerja: 'Pustu Untung Jawa', lantai: 'Lantai 2', category: 'manajemen', icon: 'Briefcase', deskripsi: 'Administrasi & pelaporan Pustu', kapasitasIdeal: 2 },
-  { id: 'uj-l2-lorong', name: 'Ruangan Selasar Lorong Lantai 2', tempatKerja: 'Pustu Untung Jawa', lantai: 'Lantai 2', category: 'umum', icon: 'Footprints', deskripsi: 'Selasar & koridor Lt. 2', kapasitasIdeal: 2 },
+  // Puskesmas Pembantu Pulau Untung Jawa - Lantai 2
+  { id: 'uj-l2-lab', name: 'Ruang LAB', tempatKerja: 'Puskesmas Pembantu Pulau Untung Jawa', lantai: 'Lantai 2', category: 'penunjang', icon: 'FlaskConical', deskripsi: 'Pemeriksaan laboratorium sederhana', kapasitasIdeal: 2 },
+  { id: 'uj-l2-gigi', name: 'Ruangan Gigi', tempatKerja: 'Puskesmas Pembantu Pulau Untung Jawa', lantai: 'Lantai 2', category: 'pelayanan', icon: 'Smile', deskripsi: 'Pemeriksaan & perawatan gigi', kapasitasIdeal: 2 },
+  { id: 'uj-l2-admin', name: 'Ruangan Administrasi', tempatKerja: 'Puskesmas Pembantu Pulau Untung Jawa', lantai: 'Lantai 2', category: 'manajemen', icon: 'Briefcase', deskripsi: 'Administrasi & pelaporan Pustu', kapasitasIdeal: 2 },
+  { id: 'uj-l2-lorong', name: 'Ruangan Selasar Lorong Lantai 2', tempatKerja: 'Puskesmas Pembantu Pulau Untung Jawa', lantai: 'Lantai 2', category: 'umum', icon: 'Footprints', deskripsi: 'Selasar & koridor Lt. 2', kapasitasIdeal: 2 },
 
-  // Pustu Pulau Pari
-  { id: 'pari-l1-umum', name: 'Poli Pelayanan Terpadu Lt. 1', tempatKerja: 'Pustu Pulau Pari', lantai: 'Lantai 1', category: 'pelayanan', icon: 'Stethoscope', deskripsi: 'Layanan kesehatan warga Pulau Pari & wisatawan', kapasitasIdeal: 2 },
-  { id: 'pari-l1-tindakan', name: 'Ruang Tindakan Gawat Darurat', tempatKerja: 'Pustu Pulau Pari', lantai: 'Lantai 1', category: 'pelayanan', icon: 'HeartPulse', deskripsi: 'Tindakan darurat sengatan laut & kecelakaan', kapasitasIdeal: 2 },
-  { id: 'pari-l2-jaga', name: 'Ruang Jaga Medis & Istirahat Lt. 2', tempatKerja: 'Pustu Pulau Pari', lantai: 'Lantai 2', category: 'penunjang', icon: 'Home', deskripsi: 'Pos siaga tenaga medis menginap', kapasitasIdeal: 2 },
+  // Puskesmas Pembantu Pulau Pari
+  { id: 'pari-l1-umum', name: 'Poli Pelayanan Terpadu Lt. 1', tempatKerja: 'Puskesmas Pembantu Pulau Pari', lantai: 'Lantai 1', category: 'pelayanan', icon: 'Stethoscope', deskripsi: 'Layanan kesehatan warga Pulau Pari & wisatawan', kapasitasIdeal: 2 },
+  { id: 'pari-l1-tindakan', name: 'Ruang Tindakan Gawat Darurat', tempatKerja: 'Puskesmas Pembantu Pulau Pari', lantai: 'Lantai 1', category: 'pelayanan', icon: 'HeartPulse', deskripsi: 'Tindakan darurat sengatan laut & kecelakaan', kapasitasIdeal: 2 },
+  { id: 'pari-l2-jaga', name: 'Ruang Jaga Medis & Istirahat Lt. 2', tempatKerja: 'Puskesmas Pembantu Pulau Pari', lantai: 'Lantai 2', category: 'penunjang', icon: 'Home', deskripsi: 'Pos siaga tenaga medis menginap', kapasitasIdeal: 2 },
 
-  // Pustu Pulau Lancang - Lantai 1
-  { id: 'lancang-l1-farmasi', name: 'Ruang Farmasi', tempatKerja: 'Pustu Pulau Lancang', lantai: 'Lantai 1', category: 'penunjang', icon: 'Pill', deskripsi: 'Penyediaan obat & peracikan', kapasitasIdeal: 2 },
-  { id: 'lancang-l1-umum', name: 'Ruang Pelayanan Umum', tempatKerja: 'Pustu Pulau Lancang', lantai: 'Lantai 1', category: 'pelayanan', icon: 'Stethoscope', deskripsi: 'Pemeriksaan medis umum', kapasitasIdeal: 2 },
-  { id: 'lancang-l1-loket', name: 'Ruangan Loket', tempatKerja: 'Pustu Pulau Lancang', lantai: 'Lantai 1', category: 'pelayanan', icon: 'Ticket', deskripsi: 'Pendaftaran & data rekam medis', kapasitasIdeal: 2 },
-  { id: 'lancang-l1-triage', name: 'Ruang Pelayanan Awal', tempatKerja: 'Pustu Pulau Lancang', lantai: 'Lantai 1', category: 'pelayanan', icon: 'Activity', deskripsi: 'Triage & pemeriksaan tanda vital', kapasitasIdeal: 2 },
-  { id: 'lancang-l1-kia', name: 'Ruang KIA', tempatKerja: 'Pustu Pulau Lancang', lantai: 'Lantai 1', category: 'pelayanan', icon: 'Baby', deskripsi: 'Kesehatan ibu, balita & KB', kapasitasIdeal: 2 },
-  { id: 'lancang-l1-lorong', name: 'Ruang Lorong Selasar Lantai 1', tempatKerja: 'Pustu Pulau Lancang', lantai: 'Lantai 1', category: 'umum', icon: 'Footprints', deskripsi: 'Lorong tunggu pasien Lt. 1', kapasitasIdeal: 3 },
+  // Puskesmas Pembantu Pulau Lancang - Lantai 1
+  { id: 'lancang-l1-farmasi', name: 'Ruang Farmasi', tempatKerja: 'Puskesmas Pembantu Pulau Lancang', lantai: 'Lantai 1', category: 'penunjang', icon: 'Pill', deskripsi: 'Penyediaan obat & peracikan', kapasitasIdeal: 2 },
+  { id: 'lancang-l1-umum', name: 'Ruang Pelayanan Umum', tempatKerja: 'Puskesmas Pembantu Pulau Lancang', lantai: 'Lantai 1', category: 'pelayanan', icon: 'Stethoscope', deskripsi: 'Pemeriksaan medis umum', kapasitasIdeal: 2 },
+  { id: 'lancang-l1-loket', name: 'Ruangan Loket', tempatKerja: 'Puskesmas Pembantu Pulau Lancang', lantai: 'Lantai 1', category: 'pelayanan', icon: 'Ticket', deskripsi: 'Pendaftaran & data rekam medis', kapasitasIdeal: 2 },
+  { id: 'lancang-l1-triage', name: 'Ruang Pelayanan Awal', tempatKerja: 'Puskesmas Pembantu Pulau Lancang', lantai: 'Lantai 1', category: 'pelayanan', icon: 'Activity', deskripsi: 'Triage & pemeriksaan tanda vital', kapasitasIdeal: 2 },
+  { id: 'lancang-l1-kia', name: 'Ruang KIA', tempatKerja: 'Puskesmas Pembantu Pulau Lancang', lantai: 'Lantai 1', category: 'pelayanan', icon: 'Baby', deskripsi: 'Kesehatan ibu, balita & KB', kapasitasIdeal: 2 },
+  { id: 'lancang-l1-lorong', name: 'Ruang Lorong Selasar Lantai 1', tempatKerja: 'Puskesmas Pembantu Pulau Lancang', lantai: 'Lantai 1', category: 'umum', icon: 'Footprints', deskripsi: 'Lorong tunggu pasien Lt. 1', kapasitasIdeal: 3 },
 
-  // Pustu Pulau Lancang - Lantai 2
-  { id: 'lancang-l2-lab', name: 'Ruang LAB', tempatKerja: 'Pustu Pulau Lancang', lantai: 'Lantai 2', category: 'penunjang', icon: 'FlaskConical', deskripsi: 'Laboratorium klinik & tes cepat', kapasitasIdeal: 2 },
-  { id: 'lancang-l2-admin', name: 'Ruang Administrasi', tempatKerja: 'Pustu Pulau Lancang', lantai: 'Lantai 2', category: 'manajemen', icon: 'Briefcase', deskripsi: 'Kantor administrasi & arsip', kapasitasIdeal: 2 },
-  { id: 'lancang-l2-gigi', name: 'Ruang Gigi', tempatKerja: 'Pustu Pulau Lancang', lantai: 'Lantai 2', category: 'pelayanan', icon: 'Smile', deskripsi: 'Pelayanan kesehatan gigi & mulut', kapasitasIdeal: 2 },
-  { id: 'lancang-l2-lorong', name: 'Ruang Selasar Lorong', tempatKerja: 'Pustu Pulau Lancang', lantai: 'Lantai 2', category: 'umum', icon: 'Footprints', deskripsi: 'Selasar akses lantai 2', kapasitasIdeal: 2 },
+  // Puskesmas Pembantu Pulau Lancang - Lantai 2
+  { id: 'lancang-l2-lab', name: 'Ruang LAB', tempatKerja: 'Puskesmas Pembantu Pulau Lancang', lantai: 'Lantai 2', category: 'penunjang', icon: 'FlaskConical', deskripsi: 'Laboratorium klinik & tes cepat', kapasitasIdeal: 2 },
+  { id: 'lancang-l2-admin', name: 'Ruang Administrasi', tempatKerja: 'Puskesmas Pembantu Pulau Lancang', lantai: 'Lantai 2', category: 'manajemen', icon: 'Briefcase', deskripsi: 'Kantor administrasi & arsip', kapasitasIdeal: 2 },
+  { id: 'lancang-l2-gigi', name: 'Ruang Gigi', tempatKerja: 'Puskesmas Pembantu Pulau Lancang', lantai: 'Lantai 2', category: 'pelayanan', icon: 'Smile', deskripsi: 'Pelayanan kesehatan gigi & mulut', kapasitasIdeal: 2 },
+  { id: 'lancang-l2-lorong', name: 'Ruang Selasar Lorong', tempatKerja: 'Puskesmas Pembantu Pulau Lancang', lantai: 'Lantai 2', category: 'umum', icon: 'Footprints', deskripsi: 'Selasar akses lantai 2', kapasitasIdeal: 2 },
 
   // Kantor Transit Jakarta
   { id: 'ktj-l1-posko', name: 'Ruang Transit & Koordinasi Pegawai', tempatKerja: 'Kantor Transit Jakarta', lantai: 'Lantai 1', category: 'manajemen', icon: 'Building2', deskripsi: 'Posko perwakilan & koordinasi dinas luar daratan Jakarta', kapasitasIdeal: 4 },

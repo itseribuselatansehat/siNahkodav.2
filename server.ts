@@ -12,7 +12,7 @@ const __dirname = path.dirname(__filename);
 async function startServer() {
   const app = express();
   const httpServer = http.createServer(app);
-  const PORT = Number(process.env.PORT) || 3000;
+  const PORT = 3000;
 
   // Middleware
   app.use(express.json({ limit: '25mb' }));
@@ -319,109 +319,6 @@ async function startServer() {
     }
   });
 
-  // GET: Database Full Sync (Dipanggil setiap 3 detik oleh semua browser untuk autorefresh live)
-  app.get('/api/database', (_req: Request, res: Response) => {
-    const db = readAppDatabase();
-    res.json({
-      success: true,
-      timestamp: Date.now(),
-      lastUpdated: db.lastUpdated,
-      data: db
-    });
-  });
-
-  // POST: Simpan / Perbarui Data ke Database Server (Tersinkronisasi otomatis ke semua perangkat)
-  app.post('/api/database', (req: Request, res: Response) => {
-    try {
-      const { action, pegawai, movementLogs, laporDiriList, payload } = req.body;
-      const currentDb = readAppDatabase();
-
-      let updatedDb = { ...currentDb };
-
-      if (action === 'checkin' && payload) {
-        // payload: { pegawaiId, tempatKerja, lantai, unitId, unitName, kondisi, catatan, lastCheckinTime, selfieUrl, coordinates, movementLog }
-        const { pegawaiId, tempatKerja, lantai, unitId, unitName, kondisi, catatan, lastCheckinTime, selfieUrl, coordinates, movementLog } = payload;
-        
-        updatedDb.pegawai = updatedDb.pegawai.map((p: any) => {
-          if (p.id === pegawaiId) {
-            return {
-              ...p,
-              status: 'hadir',
-              kondisi: kondisi || 'siap_melayani',
-              kondisiCatatan: catatan || 'Siap melayani',
-              currentTempatKerja: tempatKerja,
-              currentLantai: lantai,
-              currentUnitId: unitId,
-              currentUnitName: unitName,
-              lastCheckinTime: lastCheckinTime || new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }),
-              selfieUrl: selfieUrl || p.selfieUrl,
-              coordinates: coordinates || p.coordinates
-            };
-          }
-          return p;
-        });
-
-        if (movementLog) {
-          updatedDb.movementLogs = [movementLog, ...(updatedDb.movementLogs || [])].slice(0, 200);
-        }
-      } else if (action === 'lapordiri' && payload) {
-        // payload: LaporDiriRecord
-        updatedDb.laporDiriList = [payload, ...(updatedDb.laporDiriList || [])].slice(0, 300);
-      } else if (action === 'quick_status' && payload) {
-        // payload: { pegawaiId, kondisi, catatan }
-        const { pegawaiId, kondisi, catatan } = payload;
-        updatedDb.pegawai = updatedDb.pegawai.map((p: any) => {
-          if (p.id === pegawaiId) {
-            return {
-              ...p,
-              kondisi,
-              kondisiCatatan: catatan
-            };
-          }
-          return p;
-        });
-      } else if (action === 'reset') {
-        // Reset all rooms
-        updatedDb.pegawai = updatedDb.pegawai.map((p: any) => ({
-          ...p,
-          status: 'belum_hadir',
-          kondisi: 'belum_hadir',
-          kondisiCatatan: 'Belum check-in hari ini',
-          currentTempatKerja: undefined,
-          currentLantai: undefined,
-          currentUnitId: undefined,
-          currentUnitName: undefined,
-          lastCheckinTime: undefined
-        }));
-      } else {
-        // Direct merge
-        if (Array.isArray(pegawai)) {
-          updatedDb.pegawai = pegawai;
-        }
-        if (Array.isArray(movementLogs)) {
-          updatedDb.movementLogs = movementLogs;
-        }
-        if (Array.isArray(laporDiriList)) {
-          updatedDb.laporDiriList = laporDiriList;
-        }
-      }
-
-      const saved = writeAppDatabase(updatedDb);
-
-      res.json({
-        success: true,
-        message: 'Database berhasil diperbarui dan disinkronkan ke seluruh browser!',
-        timestamp: Date.now(),
-        lastUpdated: saved.lastUpdated,
-        data: saved
-      });
-    } catch (err: any) {
-      res.status(500).json({
-        success: false,
-        message: err.message || 'Gagal menyimpan perubahan database'
-      });
-    }
-  });
 
   // GET: Database Full Sync (Dipanggil setiap 3 detik oleh semua browser untuk autorefresh live)
   app.get('/api/database', (_req: Request, res: Response) => {
@@ -446,8 +343,11 @@ async function startServer() {
         // payload: { pegawaiId, tempatKerja, lantai, unitId, unitName, kondisi, catatan, lastCheckinTime, selfieUrl, coordinates, movementLog }
         const { pegawaiId, tempatKerja, lantai, unitId, unitName, kondisi, catatan, lastCheckinTime, selfieUrl, coordinates, movementLog } = payload;
         
+        let found = false;
         updatedDb.pegawai = updatedDb.pegawai.map((p: any) => {
-          if (p.id === pegawaiId) {
+          const match = p.id === pegawaiId || p.nip === pegawaiId || (movementLog && movementLog.nip && p.nip === movementLog.nip);
+          if (match) {
+            found = true;
             return {
               ...p,
               status: 'hadir',
@@ -458,12 +358,39 @@ async function startServer() {
               currentUnitId: unitId,
               currentUnitName: unitName,
               lastCheckinTime: lastCheckinTime || new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }),
+              lastUpdateTime: lastCheckinTime || new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }),
               selfieUrl: selfieUrl || p.selfieUrl,
               coordinates: coordinates || p.coordinates
             };
           }
           return p;
         });
+
+        if (!found) {
+          const newP = {
+            id: pegawaiId || `peg-${Date.now()}`,
+            nip: movementLog?.nip || pegawaiId,
+            nama: movementLog?.pegawaiNama || 'Pegawai',
+            profesi: 'Tenaga Kesehatan',
+            jabatan: 'Staf Pelayanan',
+            tempatTugas: tempatKerja,
+            role: 'pegawai',
+            telepon: '',
+            avatar: 'https://images.unsplash.com/photo-1534528741775?w=150&auto=format&fit=crop&q=80',
+            status: 'hadir',
+            kondisi: kondisi || 'siap_melayani',
+            kondisiCatatan: catatan || 'Siap melayani',
+            currentTempatKerja: tempatKerja,
+            currentLantai: lantai,
+            currentUnitId: unitId,
+            currentUnitName: unitName,
+            lastCheckinTime: lastCheckinTime || new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }),
+            lastUpdateTime: lastCheckinTime || new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }),
+            selfieUrl: selfieUrl,
+            coordinates: coordinates
+          };
+          updatedDb.pegawai.push(newP);
+        }
 
         if (movementLog) {
           updatedDb.movementLogs = [movementLog, ...(updatedDb.movementLogs || [])].slice(0, 200);
