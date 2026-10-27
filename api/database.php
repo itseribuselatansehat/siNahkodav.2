@@ -1,7 +1,7 @@
 <?php
 /**
  * SI NAKHODA - Hostinger PHP Backend Bridge for Real-time Database
- * Puskesmas Kecamatan Kepulauan Seribu Selatan
+ * Puskesmas Kepulauan Seribu Selatan
  * Menyinkronkan status presensi, check-in, dan lapor diri secara realtime (3 Detik)
  * antar seluruh perangkat & browser di Hostinger.
  */

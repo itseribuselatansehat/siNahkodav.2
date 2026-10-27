@@ -1,7 +1,7 @@
 <?php
 /**
  * SI NAKHODA - Hostinger PHP Backend Bridge for System Configuration
- * Puskesmas Kecamatan Kepulauan Seribu Selatan
+ * Puskesmas Kepulauan Seribu Selatan
  * Menjamin konfigurasi Google Apps Script & Google Drive tersimpan secara permanen
  * di server Hostinger dan otomatis aktif untuk SELURUH pengguna & perangkat.
  */

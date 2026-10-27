@@ -14,7 +14,7 @@ const addressCache = new Map<string, AddressCacheItem>();
 // Database titik wilayah terdaftar di Kepulauan Seribu Selatan
 const KNOWN_LOCATIONS = [
   {
-    name: 'Puskesmas Kecamatan Kepulauan Seribu Selatan',
+    name: 'Puskesmas Kepulauan Seribu Selatan',
     street: 'Jl. Raya Pulau Tidung RT 02/RW 02',
     kelurahan: 'Kel. Pulau Tidung',
     kecamatan: 'Kec. Kepulauan Seribu Selatan',

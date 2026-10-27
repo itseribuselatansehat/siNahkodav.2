@@ -128,7 +128,7 @@ export const LandingView: React.FC<LandingViewProps> = ({
       {/* Footer */}
       <div className="max-w-6xl mx-auto w-full flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 py-3 border-t border-slate-200/60 gap-2">
         <div>
-          © 2026 Puskesmas Kecamatan Kepulauan Seribu Selatan • Dinas Kesehatan DKI Jakarta
+          © 2026 Puskesmas Kepulauan Seribu Selatan • Dinas Kesehatan DKI Jakarta
         </div>
         <div className="text-slate-400 font-medium">
           SI NAKHODA v2.4 • Navigasi Kinerja Terintegrasi

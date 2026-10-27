@@ -1,6 +1,6 @@
 # ==============================================================================
 # SI NAKHODA - Hostinger LiteSpeed / Apache Dual-Mode Configuration (.htaccess)
-# Puskesmas Kecamatan Kepulauan Seribu Selatan
+# Puskesmas Kepulauan Seribu Selatan
 # ==============================================================================
 
 DirectoryIndex dist/index.html index.html index.php
@@ -18,32 +18,39 @@ DirectoryIndex dist/index.html index.html index.php
   RewriteRule ^dist/api/database/?$ dist/api/database.php [L,QSA]
 
   # ----------------------------------------------------------------------------
-  # 1. JANGAN REWRITE JIKA FILE ATAU DIREKTORI SUDAH ADA SECARA FISIK
-  # Ini mencegah loop pada file JS/CSS/PNG/SVG/PHP di root maupun di dist/
+  # 1. JANGAN PERNAH MENYAJIKAN FILE TS/TSX SECARA LANGSUNG KE BROWSER
   # ----------------------------------------------------------------------------
-  RewriteCond %{REQUEST_FILENAME} -f [OR]
-  RewriteCond %{REQUEST_FILENAME} -d
-  RewriteRule ^ - [L]
+  RewriteRule \.(tsx|ts|jsx)$ - [F,L]
 
   # ----------------------------------------------------------------------------
   # 2. SKENARIO HOSTINGER GIT CLONE (folder dist/ berada di dalam webroot)
   # ----------------------------------------------------------------------------
-  # 2.1 Jika request ke root (/), arahkan langsung ke dist/index.html
+  # 2.1 Request ke root domain (/) WAJIB diarahkan ke dist/index.html jika dist/ ada
   RewriteCond %{DOCUMENT_ROOT}/dist/index.html -f
   RewriteRule ^$ dist/index.html [L]
 
-  # 2.2 Jika request mengarah ke aset di dist (misal: /assets/app.js)
+  # 2.2 Jika browser meminta aset dari root (/assets/...), ambil dari dist/assets/
+  RewriteCond %{DOCUMENT_ROOT}/dist/assets/$1 -f
+  RewriteRule ^assets/(.*)$ dist/assets/$1 [L]
+
+  # 2.3 Jika request mengarah ke file statis fisik yang ada di dalam dist/
   RewriteCond %{DOCUMENT_ROOT}/dist/$1 -f
   RewriteRule ^(.*)$ dist/$1 [L]
 
-  # 2.3 Routing SPA untuk URL halaman dinamis
+  # ----------------------------------------------------------------------------
+  # 3. FILE FISIK STATIS LAINNYA (favicon, icon, php, dll)
+  # ----------------------------------------------------------------------------
+  RewriteCond %{REQUEST_FILENAME} -f
+  RewriteRule ^ - [L]
+
+  # ----------------------------------------------------------------------------
+  # 4. SPA ROUTING FALLBACK
+  # ----------------------------------------------------------------------------
+  # Jika ada folder dist/index.html, arahkan semua URL rute SPA ke dist/index.html
   RewriteCond %{DOCUMENT_ROOT}/dist/index.html -f
   RewriteRule . /dist/index.html [L]
 
-  # ----------------------------------------------------------------------------
-  # 3. SKENARIO DIRECT UPLOAD (isi folder dist/ di-upload langsung ke public_html)
-  # ----------------------------------------------------------------------------
-  RewriteRule ^index\.html$ - [L]
+  # Skenario jika isi folder dist/ di-upload langsung ke web root
   RewriteCond %{REQUEST_FILENAME} !-f
   RewriteCond %{REQUEST_FILENAME} !-d
   RewriteRule . /index.html [L]

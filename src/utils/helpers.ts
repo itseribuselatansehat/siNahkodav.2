@@ -160,7 +160,7 @@ export function exportMonitoringPDF({
   doc.setTextColor(30, 41, 59);
   doc.text('PEMERINTAH PROVINSI DAERAH KHUSUS IBUKOTA JAKARTA', 105, 14, { align: 'center' });
   doc.setFontSize(10);
-  doc.text('DINAS KESEHATAN - PUSKESMAS KECAMATAN KEPULAUAN SERIBU SELATAN', 105, 19, { align: 'center' });
+  doc.text('DINAS KESEHATAN - PUSKESMAS KEPULAUAN SERIBU SELATAN', 105, 19, { align: 'center' });
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(8);
   doc.setTextColor(100, 116, 139);
@@ -323,7 +323,7 @@ export function exportRekapitulasiPDF({
   doc.setTextColor(30, 41, 59);
   doc.text('PEMERINTAH PROVINSI DAERAH KHUSUS IBUKOTA JAKARTA', 105, 13, { align: 'center' });
   doc.setFontSize(9.5);
-  doc.text('DINAS KESEHATAN - PUSKESMAS KECAMATAN KEPULAUAN SERIBU SELATAN', 105, 17.5, { align: 'center' });
+  doc.text('DINAS KESEHATAN - PUSKESMAS KEPULAUAN SERIBU SELATAN', 105, 17.5, { align: 'center' });
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(7.5);
   doc.setTextColor(100, 116, 139);
@@ -582,7 +582,7 @@ export function exportLaporKegiatanPDF({
   doc.setTextColor(30, 41, 59);
   doc.text('PEMERINTAH PROVINSI DAERAH KHUSUS IBUKOTA JAKARTA', 105, 14, { align: 'center' });
   doc.setFontSize(10);
-  doc.text('DINAS KESEHATAN - PUSKESMAS KECAMATAN KEPULAUAN SERIBU SELATAN', 105, 19, { align: 'center' });
+  doc.text('DINAS KESEHATAN - PUSKESMAS KEPULAUAN SERIBU SELATAN', 105, 19, { align: 'center' });
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(8);
   doc.setTextColor(100, 116, 139);
