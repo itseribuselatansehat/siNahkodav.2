@@ -1,24 +1,20 @@
-# ==============================================================================
-# SI NAKHODA - Subfolder /dist/ Apache Configuration (.htaccess)
-# Puskesmas Kepulauan Seribu Selatan
-# ==============================================================================
-
 DirectoryIndex index.html
 
 <IfModule mod_rewrite.c>
   RewriteEngine On
   RewriteBase /dist/
 
-  # Jika file fisik atau direktori ada, sajikan langsung tanpa rewrite
-  RewriteCond %{REQUEST_FILENAME} -f [OR]
-  RewriteCond %{REQUEST_FILENAME} -d
+  # Mencegah loop pada index.html
+  RewriteRule ^index\.html$ - [L]
+
+  # Jika file fisik ada, sajikan langsung
+  RewriteCond %{REQUEST_FILENAME} -f
   RewriteRule ^ - [L]
 
-  # Routing SPA untuk semua rute di dalam /dist/
+  # SPA fallback
   RewriteRule . index.html [L]
 </IfModule>
 
-# MIME Types agar browser tidak menolak file JavaScript
 <IfModule mod_mime.c>
   AddType text/javascript .js .mjs
   AddType application/javascript .js .mjs
@@ -26,19 +22,8 @@ DirectoryIndex index.html
   AddType application/manifest+json .webmanifest
   AddType image/svg+xml .svg .svgz
   AddType application/json .json
-  AddType font/woff2 .woff2
-  AddType font/woff .woff
-</IfModule>
-
-# Jangan cache index.html agar selalu memuat update terbaru
-<IfModule mod_expires.c>
-  ExpiresActive On
-  ExpiresByType text/html "access plus 0 seconds"
-  ExpiresByType application/json "access plus 0 seconds"
 </IfModule>
 
 <IfModule mod_headers.c>
   Header always set Access-Control-Allow-Origin "*"
-  Header always set Access-Control-Allow-Methods "GET, POST, OPTIONS"
-  Header always set Access-Control-Allow-Headers "Content-Type, Authorization, X-Requested-With"
 </IfModule>

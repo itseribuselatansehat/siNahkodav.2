@@ -1,57 +1,35 @@
 # ==============================================================================
-# SI NAKHODA - Hostinger LiteSpeed / Apache Dual-Mode Configuration (.htaccess)
+# SI NAKHODA - Hostinger Production Configuration (.htaccess)
 # Puskesmas Kepulauan Seribu Selatan
 # ==============================================================================
 
-DirectoryIndex dist/index.html index.html index.php
+DirectoryIndex index.html index.php
 
 <IfModule mod_rewrite.c>
   RewriteEngine On
   RewriteBase /
 
-  # ----------------------------------------------------------------------------
-  # Rute PHP API Hostinger (Menyimpan Konfigurasi GAS & Database Real-time)
-  # ----------------------------------------------------------------------------
+  # 1. Rute API PHP
   RewriteRule ^api/system-config/?$ api/system-config.php [L,QSA]
   RewriteRule ^api/database/?$ api/database.php [L,QSA]
   RewriteRule ^dist/api/system-config/?$ dist/api/system-config.php [L,QSA]
   RewriteRule ^dist/api/database/?$ dist/api/database.php [L,QSA]
 
-  # ----------------------------------------------------------------------------
-  # 1. JANGAN PERNAH MENYAJIKAN FILE TS/TSX SECARA LANGSUNG KE BROWSER
-  # ----------------------------------------------------------------------------
-  RewriteRule \.(tsx|ts|jsx)$ - [F,L]
+  # 2. Mencegah rewrite loop pada index.html
+  RewriteRule ^index\.html$ - [L]
 
-  # ----------------------------------------------------------------------------
-  # 2. FILE FISIK STATIS: Jika file yang diminta benar-benar ada, sajikan langsung
-  # ----------------------------------------------------------------------------
+  # 3. Jika folder dist/ diakses, biarkan dist/.htaccess yang menangani
+  RewriteRule ^dist/ - [L]
+
+  # 4. Jika file fisik yang diminta ada secara langsung, sajikan langsung
   RewriteCond %{REQUEST_FILENAME} -f
   RewriteRule ^ - [L]
 
-  # ----------------------------------------------------------------------------
-  # 3. FOLDER /dist/: Biarkan .htaccess di dalam folder dist/ yang menangani
-  # ----------------------------------------------------------------------------
-  RewriteRule ^dist/ - [L]
-
-  # ----------------------------------------------------------------------------
-  # 4. ROOT DOMAIN (/): Alihkan langsung ke /dist/
-  # ----------------------------------------------------------------------------
-  RewriteRule ^$ dist/ [R=302,L]
-
-  # ----------------------------------------------------------------------------
-  # 5. ASSETS FALLBACK: Jika browser meminta /assets/ tapi ada di dist/assets/
-  # ----------------------------------------------------------------------------
-  RewriteCond %{DOCUMENT_ROOT}/dist/assets/$1 -f
-  RewriteRule ^assets/(.*)$ dist/assets/$1 [L]
-
-  # ----------------------------------------------------------------------------
-  # 6. SPA FALLBACK
-  # ----------------------------------------------------------------------------
-  RewriteCond %{DOCUMENT_ROOT}/dist/index.html -f
-  RewriteRule . /dist/index.html [L]
+  # 5. Routing SPA standar: arahkan rute halaman lain ke index.html
+  RewriteRule . /index.html [L]
 </IfModule>
 
-# MIME Types agar LiteSpeed tidak menyajikan JavaScript sebagai text/plain
+# MIME Types resmi untuk browser
 <IfModule mod_mime.c>
   AddType text/javascript .js .mjs
   AddType application/javascript .js .mjs
@@ -63,22 +41,9 @@ DirectoryIndex dist/index.html index.html index.php
   AddType font/woff .woff
 </IfModule>
 
-# Gzip / Deflate Compression
-<IfModule mod_deflate.c>
-  AddOutputFilterByType DEFLATE text/plain
-  AddOutputFilterByType DEFLATE text/html
-  AddOutputFilterByType DEFLATE text/xml
-  AddOutputFilterByType DEFLATE text/css
-  AddOutputFilterByType DEFLATE application/javascript
-  AddOutputFilterByType DEFLATE text/javascript
-  AddOutputFilterByType DEFLATE application/json
-  AddOutputFilterByType DEFLATE image/svg+xml
-</IfModule>
-
-# Browser Caching
+# Jangan cache index.html agar update selalu langsung terlihat
 <IfModule mod_expires.c>
   ExpiresActive On
-  ExpiresDefault "access plus 1 month"
   ExpiresByType text/html "access plus 0 seconds"
   ExpiresByType application/json "access plus 0 seconds"
 </IfModule>

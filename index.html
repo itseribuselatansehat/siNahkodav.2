@@ -96,21 +96,9 @@
       })();
     </script>
     <script type="module" src="/src/main.tsx"></script>
+    <script type="module" crossorigin src="./assets/index-CTb378CM.js"></script>
+    <link rel="stylesheet" crossorigin href="./assets/index-CCXg8zWf.css">
     <script>
-      // Deteksi otomatis Hostinger / Shared Hosting tanpa Node Vite:
-      (function() {
-        if (typeof window === 'undefined') return;
-        var isDevEnv = window.location.port === '3000' || 
-                       window.location.hostname === 'localhost' || 
-                       window.location.hostname === '127.0.0.1' || 
-                       window.location.hostname.indexOf('run.app') !== -1;
-        // Jika berjalan di Hostinger / server produksi dan belum di /dist/, langsung alihkan ke /dist/
-        if (!isDevEnv && window.location.pathname.indexOf('/dist') === -1) {
-          var target = (window.location.origin + window.location.pathname).replace(/\/?$/, '/dist/');
-          window.location.replace(target);
-        }
-      })();
-
       // Bersihkan Service Worker lama dan cache browser kadaluarsa secara instan
       if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {
         navigator.serviceWorker.getRegistrations().then(function(regs) {
